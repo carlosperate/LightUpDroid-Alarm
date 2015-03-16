@@ -1,24 +1,19 @@
-# Alarm Clock App
-## Based on 4.4 DeskClock
+# LightUpDroid Alarm
 
-Main difference as of now is compatibility back to API 14 instead of 19.
+This is an Android companion app for the [LightUpPi Alarm](https://github.com/carlosperate/LightUpPi-Alarm).
 
-### Dependencies Information
+It is an Android alarm app that synchronizes to the alarms running in the `LightUpPi Alarm` Raspberry Pi system.
 
-1) [datetimepicker](https://github.com/klinker41/datetimepicker)
+It is based on the [Alarm Clock](https://github.com/klinker41/alarm-clock) app from Jacob Klinker, which in turn is a modification of the official Android Open Source Project [DeskClock](https://android.googlesource.com/platform/packages/apps/DeskClock/) application for Android 4.4 Kit Kat (updated for backwards compatibility with API 14).
 
 ## License
+This project is licensed under the Apache License, Version 2.0 (the "License").
 
-    Copyright 2013 Jacob Klinker
+A copy of the License can be found in the `NOTICE` file.
 
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
+#### Original Authors 
+The original application has the following copyrights:
 
-       http://www.apache.org/licenses/LICENSE-2.0
+Copyright (c) 2013 The Android Open Source Project
 
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+Copyright (c) 2013 Jacob Klinker (updates reflected in this repository commits from the 11th of November to the 20th of November 2013)
