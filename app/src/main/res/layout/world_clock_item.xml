@@ -32,7 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent">
 
-            <com.klinker.deskclock.widget.TextClock
+            <com.embeddedlog.LightUpDroid.widget.TextClock
                 android:id="@+id/digital_clock"
                 android:format12Hour="@string/world_clock_12_hours_format"
                 android:format24Hour="@string/clock_24_hours_format"
@@ -44,7 +44,7 @@
                 android:baselineAligned="true"
                 android:layout_gravity="center"
                 android:gravity="center" />
-            <com.klinker.deskclock.AnalogClock
+            <com.embeddedlog.LightUpDroid.AnalogClock
                 android:id="@+id/analog_clock"
                 android:gravity="center"
                 android:layout_width="@dimen/world_clock_analog_size"
@@ -55,7 +55,7 @@
                 android:hand_minute="@drawable/clock_analog_minute_mipmap"
                 android:layout_marginBottom="@dimen/bottom_text_spacing_analog_small"/>
         </FrameLayout>
-        <com.klinker.deskclock.widget.EllipsizeLayout
+        <com.embeddedlog.LightUpDroid.widget.EllipsizeLayout
             android:id="@+id/city_name_layout"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
@@ -65,7 +65,7 @@
             android:gravity="center"
             >
             <include layout="@layout/world_clock_label"/>
-        </com.klinker.deskclock.widget.EllipsizeLayout>
+        </com.embeddedlog.LightUpDroid.widget.EllipsizeLayout>
 
         <View
             android:id="@+id/separator"

@@ -16,7 +16,7 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_label" msgid="6674495003718166674">"Kell"</string>
+    <string name="app_label" msgid="6674495003718166674">"LightUpDroid Alarm"</string>
     <string name="alarm_list_title" msgid="7589940465292950600">"Äratused"</string>
     <string name="add_alarm" msgid="5976616107390962899">"Lisa äratus"</string>
     <string name="menu_desk_clock" msgid="3241995064554071588">"Lauakell"</string>

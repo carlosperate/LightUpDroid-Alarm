@@ -26,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dip"/>
 
-    <com.klinker.deskclock.CircleButtonsLayout
+    <com.embeddedlog.LightUpDroid.CircleButtonsLayout
         android:id="@+id/stopwatch_circle"
         android:layout_width="match_parent"
         android:layout_height="0dip"
@@ -36,11 +36,11 @@
         android:layout_marginEnd="@dimen/circle_margin"
         android:layout_weight="5" >
 
-        <com.klinker.deskclock.timer.CountingTimerView
+        <com.embeddedlog.LightUpDroid.timer.CountingTimerView
             android:id="@+id/stopwatch_time_text"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
-        <com.klinker.deskclock.CircleTimerView
+        <com.embeddedlog.LightUpDroid.CircleTimerView
             android:id="@+id/stopwatch_time"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -84,7 +84,7 @@
             android:contentDescription="@string/sw_share_button"
             android:background="@null"
             android:src="@drawable/ic_share" />
-    </com.klinker.deskclock.CircleButtonsLayout>
+    </com.embeddedlog.LightUpDroid.CircleButtonsLayout>
 
     <Space
             android:id="@+id/end_space"

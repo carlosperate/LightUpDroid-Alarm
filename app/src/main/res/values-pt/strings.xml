@@ -16,7 +16,7 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_label" msgid="6674495003718166674">"Relógio"</string>
+    <string name="app_label" msgid="6674495003718166674">"LightUpDroid Alarm"</string>
     <string name="alarm_list_title" msgid="7589940465292950600">"Alarmes"</string>
     <string name="add_alarm" msgid="5976616107390962899">"Adicionar alarme"</string>
     <string name="alarm_timeline_title_text" msgid="595912293949219821">"PRÓXIMOS ALARMES"</string>

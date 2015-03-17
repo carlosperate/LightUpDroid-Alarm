@@ -62,7 +62,7 @@
             android:textColor="@color/clock_white"/>
     </LinearLayout>
 
-    <com.klinker.deskclock.widget.multiwaveview.GlowPadView
+    <com.embeddedlog.LightUpDroid.widget.multiwaveview.GlowPadView
         android:id="@+id/glow_pad_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

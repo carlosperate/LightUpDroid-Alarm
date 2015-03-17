@@ -16,7 +16,7 @@
   ~ limitations under the License
   -->
 
-<com.klinker.deskclock.widget.multiwaveview.GlowPadView
+<com.embeddedlog.LightUpDroid.widget.multiwaveview.GlowPadView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:dc="http://schemas.android.com/apk/res-auto"
 

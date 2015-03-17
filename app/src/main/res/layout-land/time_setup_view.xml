@@ -29,7 +29,7 @@
         android:layout_height="match_parent"
         android:gravity="center">
 
-        <com.klinker.deskclock.timer.TimerView
+        <com.embeddedlog.LightUpDroid.timer.TimerView
             android:id="@+id/timer_time_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -48,7 +48,7 @@
                     android:background="@drawable/item_background"
                     android:contentDescription="@string/timer_delete"/>
 
-        </com.klinker.deskclock.timer.TimerView>
+        </com.embeddedlog.LightUpDroid.timer.TimerView>
 
     </LinearLayout>
 

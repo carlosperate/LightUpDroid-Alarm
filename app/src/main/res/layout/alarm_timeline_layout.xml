@@ -34,7 +34,7 @@
         android:id="@+id/alarm_timeline_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
-        <com.klinker.deskclock.AlarmTimelineView
+        <com.embeddedlog.LightUpDroid.AlarmTimelineView
             android:id="@+id/alarm_timeline_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />

@@ -36,7 +36,7 @@
         android:layout_marginTop="@dimen/time_margin_top"
         android:layout_marginBottom="@dimen/screensaver_margin">
 
-        <com.klinker.deskclock.widget.TextClock
+        <com.embeddedlog.LightUpDroid.widget.TextClock
             android:id="@+id/digital_clock"
             android:format12Hour="@string/main_clock_12_hours_format"
             android:format24Hour="@string/clock_24_hours_format"
@@ -51,7 +51,7 @@
             android:textSize="@dimen/digital_screensaver_clock_text_size"
             android:textColor="@color/clock_white" />
 
-        <com.klinker.deskclock.AnalogClock
+        <com.embeddedlog.LightUpDroid.AnalogClock
             android:id="@+id/analog_clock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

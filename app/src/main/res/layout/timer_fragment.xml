@@ -24,7 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-        <com.klinker.deskclock.widget.sgv.StaggeredGridView
+        <com.embeddedlog.LightUpDroid.widget.sgv.StaggeredGridView
             android:id="@+id/timers_list"
             android:divider="@null"
             android:dividerHeight="@dimen/timer_divider_height"
@@ -56,7 +56,7 @@
     </FrameLayout>
 
 
-    <com.klinker.deskclock.TimerSetupView
+    <com.embeddedlog.LightUpDroid.TimerSetupView
             android:id="@+id/timer_setup"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

@@ -1,9 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-        package="com.klinker.deskclock"
-        android:versionCode="301" android:versionName="3.0.0">
-
-    <original-package android:name="com.android.alarmclock" />
-    <original-package android:name="com.android.deskclock" />
+        package="com.embeddedlog.LightUpDroid"
+        android:versionCode="1" android:versionName="0.1">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
@@ -20,11 +17,11 @@
                  android:requiredForAllUsers="true"
                  android:supportsRtl="true">
 
-        <provider android:name=".provider.ClockProvider"
-                android:authorities="com.klinker.deskclock"
+        <provider android:name="com.embeddedlog.LightUpDroid.provider.ClockProvider"
+                android:authorities="com.embeddedlog.LightUpDroid"
                 android:exported="false" />
 
-        <activity android:name="DeskClock"
+        <activity android:name="com.embeddedlog.LightUpDroid.DeskClock"
                 android:label="@string/app_label"
                 android:theme="@style/DeskClock"
                 android:icon="@mipmap/ic_launcher_alarmclock"
@@ -39,7 +36,7 @@
         </activity>
 
         <activity-alias android:name="DockClock"
-                android:targetActivity="DeskClock"
+                android:targetActivity="com.embeddedlog.LightUpDroid.DeskClock"
                 android:label="@string/app_label"
                 android:theme="@style/DeskClock"
                 android:icon="@mipmap/ic_launcher_alarmclock"
@@ -53,7 +50,7 @@
             </intent-filter>
         </activity-alias>
 
-        <activity android:name="SettingsActivity"
+        <activity android:name="com.embeddedlog.LightUpDroid.SettingsActivity"
                 android:label="@string/settings"
                 android:theme="@style/SettingsTheme"
                 android:taskAffinity=""
@@ -64,7 +61,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".worldclock.CitiesActivity"
+        <activity android:name="com.embeddedlog.LightUpDroid.worldclock.CitiesActivity"
                 android:label="@string/cities_activity_title"
                 android:theme="@style/CitiesTheme"
                 android:taskAffinity=""
@@ -75,7 +72,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".alarms.AlarmActivity"
+        <activity android:name="com.embeddedlog.LightUpDroid.alarms.AlarmActivity"
                 android:taskAffinity=""
                 android:excludeFromRecents="true"
                 android:theme="@style/AlarmAlertFullScreenTheme"
@@ -83,21 +80,21 @@
                 android:showOnLockScreen="true"
                 android:configChanges="orientation|screenSize|keyboardHidden|keyboard|navigation"/>
 
-        <activity android:name="ScreensaverActivity"
+        <activity android:name="com.embeddedlog.LightUpDroid.ScreensaverActivity"
                 android:excludeFromRecents="true"
                 android:taskAffinity=""
                 android:theme="@style/ScreensaverActivityTheme"
                 android:configChanges="orientation|screenSize|keyboardHidden|keyboard" />
 
-        <receiver android:name=".alarms.AlarmStateManager"
+        <receiver android:name="com.embeddedlog.LightUpDroid.alarms.AlarmStateManager"
                   android:exported="false">
         </receiver>
 
-        <service android:name=".alarms.AlarmService"
+        <service android:name="com.embeddedlog.LightUpDroid.alarms.AlarmService"
                  android:exported="false">
         </service>
 
-        <activity android:name="HandleApiCalls"
+        <activity android:name="com.embeddedlog.LightUpDroid.HandleApiCalls"
                 android:theme="@android:style/Theme.NoDisplay"
                 android:excludeFromRecents="true"
                 android:permission="com.android.alarm.permission.SET_ALARM">
@@ -116,12 +113,12 @@
         </activity>
 
         <activity-alias android:name="HandleSetAlarm"
-            android:targetActivity=".HandleApiCalls"
+            android:targetActivity="com.embeddedlog.LightUpDroid.HandleApiCalls"
             android:exported="true">
         </activity-alias>
 
 
-        <receiver android:name="AlarmInitReceiver">
+        <receiver android:name="com.embeddedlog.LightUpDroid.AlarmInitReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.TIME_SET" />
@@ -131,7 +128,7 @@
         </receiver>
 
         <!-- Dream (screensaver) implementation -->
-        <service android:name="Screensaver"
+        <service android:name="com.embeddedlog.LightUpDroid.Screensaver"
             android:exported="true"
             android:label="@string/app_label">
             <intent-filter>
@@ -144,7 +141,7 @@
         </service>
 
         <!-- Settings activity for screensaver -->
-        <activity android:name=".ScreensaverSettingsActivity"
+        <activity android:name="com.embeddedlog.LightUpDroid.ScreensaverSettingsActivity"
                 android:label="@string/screensaver_settings"
                 android:theme="@android:style/Theme.Holo"
                 android:taskAffinity=""
@@ -159,7 +156,7 @@
         <!-- This activity is basically like the TimerFragment in DeskClock
          but only during lock screen
          so that is only has the fired timers -->
-        <activity android:name="com.klinker.deskclock.timer.TimerAlertFullScreen"
+        <activity android:name="com.embeddedlog.LightUpDroid.timer.TimerAlertFullScreen"
                 android:excludeFromRecents="true"
                 android:theme="@style/AlarmAlertFullScreenTheme"
                 android:launchMode="singleInstance"
@@ -167,7 +164,7 @@
                 android:taskAffinity=""
                 android:configChanges="orientation|screenSize|keyboardHidden|keyboard|navigation"/>
 
-        <service android:name="TimerRingService"
+        <service android:name="com.embeddedlog.LightUpDroid.TimerRingService"
                 android:exported="false"
                 android:description="@string/timer_ring_service_desc">
             <intent-filter>
@@ -175,7 +172,7 @@
             </intent-filter>
         </service>
 
-        <receiver android:name="com.klinker.deskclock.timer.TimerReceiver"
+        <receiver android:name="com.embeddedlog.LightUpDroid.timer.TimerReceiver"
                 android:exported="false">
             <intent-filter>
                 <action android:name="start_timer" />
@@ -194,7 +191,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name="com.klinker.deskclock.stopwatch.StopwatchService"
+        <service android:name="com.embeddedlog.LightUpDroid.stopwatch.StopwatchService"
                 android:exported="false"
                 android:description="@string/stopwatch_service_desc">
             <intent-filter>

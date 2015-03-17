@@ -15,7 +15,7 @@
 -->
 
 <!-- timer item in the list of active timers -->
-<com.klinker.deskclock.CircleButtonsLayout
+<com.embeddedlog.LightUpDroid.CircleButtonsLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/timer_circle"
         android:layout_width="match_parent"
@@ -25,12 +25,12 @@
         android:layout_marginRight="@dimen/timer_circle_margin"
         android:layout_marginEnd="@dimen/timer_circle_margin">
 
-    <com.klinker.deskclock.CircleTimerView
+    <com.embeddedlog.LightUpDroid.CircleTimerView
             android:id="@+id/timer_time"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
-    <com.klinker.deskclock.timer.CountingTimerView
+    <com.embeddedlog.LightUpDroid.timer.CountingTimerView
             android:id="@+id/timer_time_text"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
@@ -109,5 +109,5 @@
             android:contentDescription="@string/timer_delete"
             style="@style/button"
             android:layout_height="56dip"/>
-</com.klinker.deskclock.CircleButtonsLayout>
+</com.embeddedlog.LightUpDroid.CircleButtonsLayout>
 

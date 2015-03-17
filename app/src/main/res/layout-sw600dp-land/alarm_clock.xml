@@ -91,7 +91,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone" >
-        <com.klinker.deskclock.widget.ActionableToastBar
+        <com.embeddedlog.LightUpDroid.widget.ActionableToastBar
             android:id="@+id/undo_bar"
             android:layout_width="match_parent"
             android:layout_height="64dip"
