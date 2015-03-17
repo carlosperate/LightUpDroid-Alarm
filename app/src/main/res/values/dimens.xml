@@ -55,7 +55,7 @@
     <dimen name="timer_circle_width">350dip</dimen>
     <dimen name="bottom_text_size">16sp</dimen>
 
-    <dimen name="actionbar_tab_padding">0dip</dimen>
+    <dimen name="actionbar_tab_padding">12dip</dimen>
     <dimen name="actionbar_title_font_size">22sp</dimen>
 
     <dimen name="footer_button_size">56dip</dimen>

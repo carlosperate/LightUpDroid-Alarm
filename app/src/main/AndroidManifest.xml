@@ -24,7 +24,7 @@
         <activity android:name="com.embeddedlog.LightUpDroid.DeskClock"
                 android:label="@string/app_label"
                 android:theme="@style/DeskClock"
-                android:icon="@mipmap/ic_launcher_alarmclock"
+                android:icon="@drawable/action_bar_icon"
                 android:launchMode="singleTask"
                 >
 

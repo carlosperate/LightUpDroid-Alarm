@@ -17,7 +17,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingTop="?android:attr/actionBarSize" >
+    android:background="@color/blue_grey_700"
+    android:foreground="@drawable/bottom_shadow" >
 
     <Space
             android:id="@+id/start_space"

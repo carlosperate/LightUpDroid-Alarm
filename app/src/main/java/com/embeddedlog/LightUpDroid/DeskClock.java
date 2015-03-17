@@ -43,7 +43,6 @@ import android.widget.TextView;
 
 import com.embeddedlog.LightUpDroid.alarms.AlarmStateManager;
 import com.embeddedlog.LightUpDroid.provider.Alarm;
-import com.embeddedlog.LightUpDroid.stopwatch.StopwatchFragment;
 import com.embeddedlog.LightUpDroid.stopwatch.StopwatchService;
 import com.embeddedlog.LightUpDroid.stopwatch.Stopwatches;
 import com.embeddedlog.LightUpDroid.timer.TimerFragment;
@@ -51,6 +50,7 @@ import com.embeddedlog.LightUpDroid.timer.TimerObj;
 import com.embeddedlog.LightUpDroid.timer.Timers;
 import com.embeddedlog.LightUpDroid.worldclock.CitiesActivity;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Locale;
@@ -129,7 +129,7 @@ public class DeskClock extends Activity implements LabelDialogFragment.TimerLabe
         mActionBar = getActionBar();
 
         if (mActionBar != null) {
-            mActionBar.setDisplayOptions(0);
+            mActionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_TITLE | ActionBar.DISPLAY_SHOW_HOME);
             mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
             mAlarmTab = mActionBar.newTab();
@@ -142,18 +142,41 @@ public class DeskClock extends Activity implements LabelDialogFragment.TimerLabe
             mClockTab.setContentDescription(R.string.menu_clock);
             mTabsAdapter.addTab(mClockTab, ClockFragment.class, CLOCK_TAB_INDEX);
 
-            mTimerTab = mActionBar.newTab();
-            mTimerTab.setIcon(R.drawable.timer_tab);
-            mTimerTab.setContentDescription(R.string.menu_timer);
-            mTabsAdapter.addTab(mTimerTab, TimerFragment.class, TIMER_TAB_INDEX);
+            //mTimerTab = mActionBar.newTab();
+            //mTimerTab.setIcon(R.drawable.timer_tab);
+            //mTimerTab.setContentDescription(R.string.menu_timer);
+            //mTabsAdapter.addTab(mTimerTab, TimerFragment.class, TIMER_TAB_INDEX);
 
-            mStopwatchTab = mActionBar.newTab();
-            mStopwatchTab.setIcon(R.drawable.stopwatch_tab);
-            mStopwatchTab.setContentDescription(R.string.menu_stopwatch);
-            mTabsAdapter.addTab(mStopwatchTab, StopwatchFragment.class,STOPWATCH_TAB_INDEX);
+            //mStopwatchTab = mActionBar.newTab();
+            //mStopwatchTab.setIcon(R.drawable.stopwatch_tab);
+            //mStopwatchTab.setContentDescription(R.string.menu_stopwatch);
+            //mTabsAdapter.addTab(mStopwatchTab, StopwatchFragment.class,STOPWATCH_TAB_INDEX);
 
             mActionBar.setSelectedNavigationItem(selectedIndex);
             mTabsAdapter.notifySelectedPage(selectedIndex);
+
+            forceTabsInActionBar();
+        }
+    }
+
+    public void forceTabsInActionBar() {
+        try {
+            final ActionBar actionBar = getActionBar();
+            final Method setHasEmbeddedTabsMethod = actionBar.getClass()
+                    .getDeclaredMethod("setHasEmbeddedTabs", boolean.class);
+            setHasEmbeddedTabsMethod.setAccessible(true);
+            setHasEmbeddedTabsMethod.invoke(actionBar, true);
+        }
+        catch(final Exception e) {
+            // Safe to ignore exception, standard tabs will appear.
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(final Configuration config) {
+        super.onConfigurationChanged(config);
+        if (config.orientation==Configuration.ORIENTATION_PORTRAIT) {
+            forceTabsInActionBar();
         }
     }
 

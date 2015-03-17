@@ -15,5 +15,5 @@
 -->
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="@color/transparent"
-    android:shape="rectangle" />
+    android:background="@color/blue_grey_800"
+    android:shape="rectangle"/>
