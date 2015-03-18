@@ -1296,7 +1296,12 @@ public class AlarmClockFragment extends DeskClockFragment implements
             if (Alarm.NO_RINGTONE_URI.equals(alarm.alert)) {
                 ringtone = mContext.getResources().getString(R.string.silent_alarm_summary);
             } else {
-                ringtone = getRingToneTitle(alarm.alert);
+                final String ringtone_tmp = getRingToneTitle(alarm.alert);
+                if (ringtone_tmp == null) {
+                    ringtone = mContext.getResources().getString(R.string.silent_alarm_summary);
+                } else {
+                    ringtone = ringtone_tmp;
+                }
             }
             itemHolder.ringtone.setText(ringtone);
             itemHolder.ringtone.setContentDescription(
