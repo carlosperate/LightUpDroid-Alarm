@@ -335,4 +335,5 @@
     <string name="digital_gadget" msgid="2326954556720571358">"Digital clock"</string>
     <string name="no_alarms" msgid="6429431324842022917">"No Alarms"</string>
     <string name="no_upcoming_alarms" msgid="2889840988069436254">"NO UPCOMING ALARMS"</string>
+    <string name="alarm_alert_alert_silenced">"Alarm Silenced"</string>
 </resources>

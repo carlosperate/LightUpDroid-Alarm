@@ -22,6 +22,7 @@ import android.content.res.Resources;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
+import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -30,6 +31,7 @@ import android.provider.Settings;
 import android.text.format.DateUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.embeddedlog.LightUpDroid.worldclock.Cities;
 
@@ -37,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 
 /**
  * Settings for the Alarm Clock.
@@ -64,10 +67,19 @@ public class SettingsActivity extends PreferenceActivity
     public static final String KEY_VOLUME_BUTTONS =
             "volume_button_setting";
 
+    // LightUpPi settings keys
+    public static final String KEY_LIGHTUPPI_SERVER =
+            "lightuppi_server";
+    public static final String KEY_LIGHTUPPI_KEEP_NEW =
+            "lightuppi_keep_new_alarms";
+
     public static final String DEFAULT_VOLUME_BEHAVIOR = "0";
 
     private static CharSequence[][] mTimezones;
     private long mTime;
+
+    // Regular expresion used for IP input check
+    private static final Pattern ipRegEx = Pattern.compile("\\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b");
 
 
     @Override
@@ -151,6 +163,7 @@ public class SettingsActivity extends PreferenceActivity
 
     @Override
     public boolean onPreferenceChange(Preference pref, Object newValue) {
+        boolean validInput = true;
         if (KEY_AUTO_SILENCE.equals(pref.getKey())) {
             final ListPreference listPref = (ListPreference) pref;
             String delay = (String) newValue;
@@ -173,8 +186,22 @@ public class SettingsActivity extends PreferenceActivity
             final ListPreference listPref = (ListPreference) pref;
             final int idx = listPref.findIndexOfValue((String) newValue);
             listPref.setSummary(listPref.getEntries()[idx]);
+        } else if (KEY_LIGHTUPPI_SERVER.equals(pref.getKey())) {
+            final EditTextPreference textPref = (EditTextPreference) pref;
+            // Check if the new value is a valid IP
+            if (ipRegEx.matcher((String) newValue).matches()) {
+                textPref.setSummary((String) newValue);
+                // TODO: Here trigger the pi IP change
+            } else {
+                Toast.makeText(getApplicationContext(), R.string.lightuppi_invalid_ip,
+                        Toast.LENGTH_LONG).show();
+                validInput = false;
+            }
+        } else if (KEY_LIGHTUPPI_KEEP_NEW.equals(pref.getKey())) {
+            boolean state =((CheckBoxPreference) pref).isChecked();
+            // TODO: Here trigger the changes for the LightUpDroid sync
         }
-        return true;
+        return validInput;
     }
 
     @Override
@@ -217,12 +244,19 @@ public class SettingsActivity extends PreferenceActivity
         listPref.setEnabled(state);
         listPref.setSummary(listPref.getEntry());
 
-        listPref = (ListPreference) findPreference(KEY_VOLUME_BUTTONS);
+        listPref = (ListPreference)findPreference(KEY_VOLUME_BUTTONS);
         listPref.setSummary(listPref.getEntry());
         listPref.setOnPreferenceChangeListener(this);
 
         SnoozeLengthDialog snoozePref = (SnoozeLengthDialog) findPreference(KEY_ALARM_SNOOZE);
         snoozePref.setSummary();
+
+        EditTextPreference piServerPref = (EditTextPreference)findPreference(KEY_LIGHTUPPI_SERVER);
+        piServerPref.setSummary(piServerPref.getText());
+        piServerPref.setOnPreferenceChangeListener(this);
+
+        Preference piKeepPref = findPreference(KEY_LIGHTUPPI_KEEP_NEW);
+        piKeepPref.setOnPreferenceChangeListener(this);
     }
 
     private class TimeZoneRow implements Comparable<TimeZoneRow> {

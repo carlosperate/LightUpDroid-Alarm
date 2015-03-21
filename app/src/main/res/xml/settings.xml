@@ -16,6 +16,22 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:title="@string/settings">
     <PreferenceCategory
+        android:title="@string/lightuppi">
+        <!-- lightuppi_server is for an IP address, so phone type helps -->
+        <EditTextPreference
+            android:key="lightuppi_server"
+            android:title="@string/lightuppi_set_server"
+            android:inputType="phone"
+            android:digits="0123456789."
+            android:defaultValue="192.168.0.7" />
+        <CheckBoxPreference
+            android:key="lightuppi_keep_new_alarms"
+            android:title="@string/lightuppi_keep_new_alarms"
+            android:summary="@string/lightuppi_keep_new_alarms_summary"
+            android:defaultValue="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:title="@string/clock_settings">
         <ListPreference
             android:key="clock_style"
@@ -47,7 +63,7 @@
             android:defaultValue="10"
             android:dialogTitle="@string/auto_silence_title" />
 
-       <com.embeddedlog.LightUpDroid.SnoozeLengthDialog
+        <com.embeddedlog.LightUpDroid.SnoozeLengthDialog
             android:key="snooze_duration"
             android:title="@string/snooze_duration_title"
             android:defaultValue="10"/>
