@@ -824,5 +824,7 @@
     <string name="lightuppi_keep_new_alarms">Keep new phone alarms on sync</string>
     <string name="lightuppi_keep_new_alarms_summary">When syncing with the LightUpPi server, ensure the new alarms created offline are maintained</string>
     <string name="lightuppi_invalid_ip">Invalid IP entered, original kept !</string>
+    <string name="lightuppi_syncing_title">Syncing Alarms</string>
+    <string name="lightuppi_syncing_body">Retrieving alarms from LightUpPi server</string>
 </resources>
 
