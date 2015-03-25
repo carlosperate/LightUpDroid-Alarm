@@ -57,7 +57,8 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
             VIBRATE,
             LABEL,
             RINGTONE,
-            DELETE_AFTER_USE
+            DELETE_AFTER_USE,
+            LIGHTUPPI_ID
     };
 
     /**
@@ -73,8 +74,9 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
     private static final int LABEL_INDEX = 6;
     private static final int RINGTONE_INDEX = 7;
     private static final int DELETE_AFTER_USE_INDEX = 8;
+    private static final int LIGHTUPPI_ID_INDEX = 9;
 
-    private static final int COLUMN_COUNT = DELETE_AFTER_USE_INDEX + 1;
+    private static final int COLUMN_COUNT = LIGHTUPPI_ID_INDEX + 1;
 
     public static ContentValues createContentValues(Alarm alarm) {
         ContentValues values = new ContentValues(COLUMN_COUNT);
@@ -89,6 +91,7 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
         values.put(VIBRATE, alarm.vibrate ? 1 : 0);
         values.put(LABEL, alarm.label);
         values.put(DELETE_AFTER_USE, alarm.deleteAfterUse);
+        values.put(LIGHTUPPI_ID, alarm.lightuppiId);
         if (alarm.alert == null) {
             // We want to put null, so default alarm changes
             values.putNull(RINGTONE);
@@ -149,6 +152,19 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
         }
 
         return result;
+    }
+
+    /**
+     * Get alarm by LightUp Pi ID.
+     *
+     * TODO: actually make this work
+     *
+     * @param contentResolver to perform the query on.
+     * @param lightuppiId ID for the LightUpPi alarm to find.
+     * @return alarm if found, null otherwise
+     */
+    public static Alarm getAlarmLightuppiId(ContentResolver contentResolver, long lightuppiId) {
+        return null;
     }
 
     /**
@@ -216,7 +232,6 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
     };
 
     // Public fields
-    // TODO: Refactor instance names
     public long id;
     public boolean enabled;
     public int hour;
@@ -226,6 +241,7 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
     public String label;
     public Uri alert;
     public boolean deleteAfterUse;
+    public long lightuppiId;
 
     // Creates a default alarm at the current time.
     public Alarm() {
@@ -237,6 +253,7 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
         this.hour = hour;
         this.minutes = minutes;
         this.vibrate = true;
+        // TODO: By default we should have full repeat
         this.daysOfWeek = new DaysOfWeek(0);
         this.label = "";
         this.alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
@@ -252,6 +269,7 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
         vibrate = c.getInt(VIBRATE_INDEX) == 1;
         label = c.getString(LABEL_INDEX);
         deleteAfterUse = c.getInt(DELETE_AFTER_USE_INDEX) == 1;
+        lightuppiId = c.getLong(LIGHTUPPI_ID_INDEX);
 
         if (c.isNull(RINGTONE_INDEX)) {
             // Should we be saving this with the current ringtone or leave it null
@@ -272,6 +290,7 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
         label = p.readString();
         alert = (Uri) p.readParcelable(null);
         deleteAfterUse = p.readInt() == 1;
+        lightuppiId = p.readLong();
     }
 
     public String getLabelOrDefault(Context context) {
@@ -291,6 +310,7 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
         p.writeString(label);
         p.writeParcelable(alert, flags);
         p.writeInt(deleteAfterUse ? 1 : 0);
+        p.writeLong(lightuppiId);
     }
 
     public int describeContents() {
@@ -322,6 +342,7 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
         result.mVibrate = vibrate;
         result.mLabel = label;
         result.mRingtone = alert;
+        result.mLightuppiId = lightuppiId;
         return result;
     }
 
@@ -349,6 +370,7 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
                 ", vibrate=" + vibrate +
                 ", label='" + label + '\'' +
                 ", deleteAfterUse=" + deleteAfterUse +
+                ", lightuppiId=" + lightuppiId +
                 '}';
     }
 }

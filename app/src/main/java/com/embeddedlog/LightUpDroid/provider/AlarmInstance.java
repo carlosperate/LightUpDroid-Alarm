@@ -71,7 +71,8 @@ public final class AlarmInstance implements ClockContract.InstancesColumns {
             VIBRATE,
             RINGTONE,
             ALARM_ID,
-            ALARM_STATE
+            ALARM_STATE,
+            LIGHTUPPI_ID
     };
 
     /**
@@ -89,8 +90,9 @@ public final class AlarmInstance implements ClockContract.InstancesColumns {
     private static final int RINGTONE_INDEX = 8;
     private static final int ALARM_ID_INDEX = 9;
     private static final int ALARM_STATE_INDEX = 10;
+    private static final int LIGHTUPPI_ID_INDEX = 11;
 
-    private static final int COLUMN_COUNT = ALARM_STATE_INDEX + 1;
+    private static final int COLUMN_COUNT = LIGHTUPPI_ID_INDEX + 1;
     private Calendar mTimeout;
 
     public static ContentValues createContentValues(AlarmInstance instance) {
@@ -115,6 +117,7 @@ public final class AlarmInstance implements ClockContract.InstancesColumns {
         }
         values.put(ALARM_ID, instance.mAlarmId);
         values.put(ALARM_STATE, instance.mAlarmState);
+        values.put(LIGHTUPPI_ID, instance.mLightuppiId);
         return values;
     }
 
@@ -169,6 +172,18 @@ public final class AlarmInstance implements ClockContract.InstancesColumns {
     public static List<AlarmInstance> getInstancesByAlarmId(ContentResolver contentResolver,
             long alarmId) {
         return getInstances(contentResolver, ALARM_ID + "=" + alarmId);
+    }
+
+    /**
+     * Get an alarm instances by LightUpPi alarm ID.
+     *
+     * @param contentResolver to perform the query on.
+     * @param lightuppiId ID of the LightUpPi alarm instances desired.
+     * @return list of alarms instances that have the LightUpPi ID.
+     */
+    public static List<AlarmInstance> getInstancesByLightuppiId(ContentResolver contentResolver,
+                                                            long lightuppiId) {
+        return getInstances(contentResolver, LIGHTUPPI_ID + "=" + lightuppiId);
     }
 
     /**
@@ -253,6 +268,7 @@ public final class AlarmInstance implements ClockContract.InstancesColumns {
     public Uri mRingtone;
     public Long mAlarmId;
     public int mAlarmState;
+    public Long mLightuppiId;
 
     public AlarmInstance(Calendar calendar, Long alarmId) {
         this(calendar);
@@ -261,6 +277,7 @@ public final class AlarmInstance implements ClockContract.InstancesColumns {
 
     public AlarmInstance(Calendar calendar) {
         mId = INVALID_ID;
+        mLightuppiId = null;
         setAlarmTime(calendar);
         mLabel = "";
         mVibrate = false;
@@ -289,6 +306,10 @@ public final class AlarmInstance implements ClockContract.InstancesColumns {
             mAlarmId = c.getLong(ALARM_ID_INDEX);
         }
         mAlarmState = c.getInt(ALARM_STATE_INDEX);
+
+        if (!c.isNull(LIGHTUPPI_ID_INDEX)) {
+            mLightuppiId = c.getLong(LIGHTUPPI_ID_INDEX);
+        }
     }
 
     public String getLabelOrDefault(Context context) {
@@ -399,6 +420,7 @@ public final class AlarmInstance implements ClockContract.InstancesColumns {
                 ", mVibrate=" + mVibrate +
                 ", mRingtone=" + mRingtone +
                 ", mAlarmId=" + mAlarmId +
+                ", mLightuppiId=" + mLightuppiId +
                 ", mAlarmState=" + mAlarmState +
                 '}';
     }

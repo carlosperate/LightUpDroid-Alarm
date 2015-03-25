@@ -125,6 +125,12 @@ public final class ClockContract {
          * <p>Type: INTEGER</p>
          */
         public static final String DELETE_AFTER_USE = "delete_after_use";
+
+        /**
+         * The ID of this alarm as it is stored into the LightUpPi server.
+         * <p>Type: INTEGER</p>
+         */
+        public static final String LIGHTUPPI_ID = "lightuppi_id";
     }
 
     /**
@@ -241,6 +247,12 @@ public final class ClockContract {
          * <p>Type: INTEGER (long)</p>
          */
         public static final String ALARM_ID = "alarm_id";
+
+        /**
+         * Key to LightUpPi server alarm
+         * <p>Type: INTEGER (long)</p>
+         */
+        public static final String LIGHTUPPI_ID = "lightuppi_id";
 
         /**
          * Alarm state
