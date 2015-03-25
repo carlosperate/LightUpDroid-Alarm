@@ -17,3 +17,5 @@ The original application has the following copyrights:
 Copyright (c) 2013 The Android Open Source Project
 
 Copyright (c) 2013 Jacob Klinker (updates reflected in this repository commits from the 11th of November to the 20th of November 2013)
+
+Changes to the original source code can be reviewed [here](https://github.com/carlosperate/LightUpDroid-Alarm/compare/fc391e1405f2d2e9f0b5a9e81b7e9aefa518f0d1...master).

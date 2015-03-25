@@ -22,11 +22,13 @@ npp.session
 /local.properties
 /.idea/workspace.xml
 /.idea/libraries
+/.idea/dictionaries
 /build
 /*/out
 /*/build
 /*/*/build
 /*/*/production
+
 
 ###########
 # Android #
