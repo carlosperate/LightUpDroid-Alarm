@@ -16,6 +16,18 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:id="@+id/menu_items">
+        <item android:id="@+id/menu_item_sync_lightuppi"
+            android:title="@string/menu_item_sync_lightuppi"
+            android:icon="@android:drawable/ic_menu_preferences"/>
+        <item android:id="@+id/menu_item_push_to_lightuppi"
+            android:title="@string/menu_item_push_to_lightuppi"
+            android:icon="@android:drawable/ic_menu_preferences"/>
+        <item android:id="@+id/menu_item_push_to_phone"
+            android:title="@string/menu_item_push_to_phone"
+            android:icon="@android:drawable/ic_menu_preferences"/>
+        <item android:id="@+id/menu_item_reset_db"
+            android:title="@string/menu_item_reset_db"
+            android:icon="@android:drawable/ic_menu_preferences"/>
         <item android:id="@+id/menu_item_night_mode"
             android:title="@string/menu_item_night_mode"
             android:icon="@android:drawable/ic_menu_preferences"/>

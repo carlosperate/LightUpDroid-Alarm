@@ -19,9 +19,11 @@ package com.embeddedlog.LightUpDroid;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -29,9 +31,11 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -42,7 +46,9 @@ import android.view.View.OnTouchListener;
 import android.widget.TextView;
 
 import com.embeddedlog.LightUpDroid.alarms.AlarmStateManager;
+import com.embeddedlog.LightUpDroid.alarms.LightUpPiSync;
 import com.embeddedlog.LightUpDroid.provider.Alarm;
+import com.embeddedlog.LightUpDroid.provider.ClockDatabaseHelper;
 import com.embeddedlog.LightUpDroid.stopwatch.StopwatchService;
 import com.embeddedlog.LightUpDroid.stopwatch.Stopwatches;
 import com.embeddedlog.LightUpDroid.timer.TimerFragment;
@@ -71,6 +77,8 @@ public class DeskClock extends Activity implements LabelDialogFragment.TimerLabe
 
     public static final String SELECT_TAB_INTENT_EXTRA = "LightUpDroid.select.tab";
 
+    private LightUpPiSync mLightUpPiSync;
+
     private ActionBar mActionBar;
     private Tab mAlarmTab;
     private Tab mClockTab;
@@ -93,6 +101,19 @@ public class DeskClock extends Activity implements LabelDialogFragment.TimerLabe
     public static final int RTL_STOPWATCH_TAB_INDEX = 0;
 
     private int mSelectedTab;
+
+    // Handler and runnables for setting the action bar title based on LightUpPi server status
+    final Handler mHandler = new Handler();
+    final Runnable lightUpPiOnline = new Runnable() {
+        public void run() {
+            mActionBar.setTitle("LightUpPi ONLINE");
+        }
+    };
+    final Runnable lightUpPiOffline = new Runnable() {
+        public void run() {
+            mActionBar.setTitle(Html.fromHtml("<font color='#ff0000'>OFFLINE </font>"));
+        }
+    };
 
     @Override
     public void onNewIntent(Intent newIntent) {
@@ -117,7 +138,7 @@ public class DeskClock extends Activity implements LabelDialogFragment.TimerLabe
             mViewPager = new ViewPager(this);
             mViewPager.setId(R.id.desk_clock_pager);
             // Keep all four tabs to minimize jank.
-            mViewPager.setOffscreenPageLimit(3);
+            mViewPager.setOffscreenPageLimit(2);
             mTabsAdapter = new TabsAdapter(this, mViewPager);
             createTabs(mSelectedTab);
         }
@@ -155,20 +176,20 @@ public class DeskClock extends Activity implements LabelDialogFragment.TimerLabe
             mActionBar.setSelectedNavigationItem(selectedIndex);
             mTabsAdapter.notifySelectedPage(selectedIndex);
 
-            forceTabsInActionBar();
+            forceTabsInActionBar(mActionBar);
         }
     }
 
-    public void forceTabsInActionBar() {
+    public void forceTabsInActionBar(final ActionBar actionBar) {
         try {
-            final ActionBar actionBar = getActionBar();
-            final Method setHasEmbeddedTabsMethod = actionBar.getClass()
-                    .getDeclaredMethod("setHasEmbeddedTabs", boolean.class);
+            final Method setHasEmbeddedTabsMethod =
+                    actionBar.getClass().getDeclaredMethod("setHasEmbeddedTabs", boolean.class);
             setHasEmbeddedTabsMethod.setAccessible(true);
             setHasEmbeddedTabsMethod.invoke(actionBar, true);
         }
         catch(final Exception e) {
             // Safe to ignore exception, standard tabs will appear.
+            Log.e(LOG_TAG, "Error enabling embedded tabs", e);
         }
     }
 
@@ -176,7 +197,7 @@ public class DeskClock extends Activity implements LabelDialogFragment.TimerLabe
     public void onConfigurationChanged(final Configuration config) {
         super.onConfigurationChanged(config);
         if (config.orientation==Configuration.ORIENTATION_PORTRAIT) {
-            forceTabsInActionBar();
+            forceTabsInActionBar(getActionBar());
         }
     }
 
@@ -203,6 +224,10 @@ public class DeskClock extends Activity implements LabelDialogFragment.TimerLabe
         // We need to update the system next alarm time on app startup because the
         // user might have clear our data.
         AlarmStateManager.updateNextAlarm(this);
+
+        // Instantiate the LightUpPiSync and start checking if the server is up
+        mLightUpPiSync = new LightUpPiSync(this);
+        mLightUpPiSync.startBackgroundServerCheck(mHandler, lightUpPiOnline, lightUpPiOffline);
     }
 
     @Override
@@ -223,6 +248,8 @@ public class DeskClock extends Activity implements LabelDialogFragment.TimerLabe
         Intent timerIntent = new Intent();
         timerIntent.setAction(Timers.NOTIF_IN_USE_CANCEL);
         sendBroadcast(timerIntent);
+
+        mLightUpPiSync.startBackgroundServerCheck(mHandler, lightUpPiOnline, lightUpPiOffline);
     }
 
     @Override
@@ -236,6 +263,8 @@ public class DeskClock extends Activity implements LabelDialogFragment.TimerLabe
         editor.putBoolean(Timers.NOTIF_APP_OPEN, false);
         editor.apply();
         Utils.showInUseNotifications(this);
+
+        mLightUpPiSync.stopBackgroundServerCheck();
 
         super.onPause();
     }
@@ -291,12 +320,29 @@ public class DeskClock extends Activity implements LabelDialogFragment.TimerLabe
             Utils.prepareHelpMenuItem(this, help);
         }
 
-        // Hide "lights out" for timer.
+        // Hide "lights out" if not in Clock tab.
         MenuItem nightMode = menu.findItem(R.id.menu_item_night_mode);
-        if (mActionBar.getSelectedNavigationIndex() == ALARM_TAB_INDEX) {
-            nightMode.setVisible(false);
-        } else if (mActionBar.getSelectedNavigationIndex() == CLOCK_TAB_INDEX) {
+        if (mActionBar.getSelectedNavigationIndex() == CLOCK_TAB_INDEX) {
             nightMode.setVisible(true);
+        } else {
+            nightMode.setVisible(false);
+        }
+
+        // Hide "reset alarm" and "sync/push with LightUpPi" if not in alarm tab
+        MenuItem syncLightuppi = menu.findItem(R.id.menu_item_sync_lightuppi);
+        MenuItem resetAlarms = menu.findItem(R.id.menu_item_reset_db);
+        MenuItem pushPiAlarms = menu.findItem(R.id.menu_item_push_to_lightuppi);
+        MenuItem pushPhoneAlarms = menu.findItem(R.id.menu_item_push_to_phone);
+        if (mActionBar.getSelectedNavigationIndex() == ALARM_TAB_INDEX) {
+            syncLightuppi.setVisible(true);
+            resetAlarms.setVisible(true);
+            pushPiAlarms.setVisible(true);
+            pushPhoneAlarms.setVisible(true);
+        } else {
+            syncLightuppi.setVisible(false);
+            resetAlarms.setVisible(false);
+            pushPiAlarms.setVisible(false);
+            pushPhoneAlarms.setVisible(false);
         }
     }
 
@@ -310,6 +356,7 @@ public class DeskClock extends Activity implements LabelDialogFragment.TimerLabe
     }
 
     private boolean processMenuClick(MenuItem item) {
+
         switch (item.getItemId()) {
             case R.id.menu_item_settings:
                 startActivity(new Intent(DeskClock.this, SettingsActivity.class));
@@ -326,6 +373,30 @@ public class DeskClock extends Activity implements LabelDialogFragment.TimerLabe
                 return true;
             case R.id.menu_item_night_mode:
                 startActivity(new Intent(DeskClock.this, ScreensaverActivity.class));
+            case R.id.menu_item_sync_lightuppi:
+                // TODO: update LightUpPiSync to actually sync alarms and then update this bit
+                mLightUpPiSync.getAllServerAlarms();
+                return true;
+            case R.id.menu_item_push_to_lightuppi:
+                // TODO: update LightUpPiSync to actually push alarms and then update this bit
+                mLightUpPiSync.getAllServerAlarms();
+                return true;
+            case R.id.menu_item_push_to_phone:
+                // TODO: update LightUpPiSync to actually push alarms and then update this bit
+                return true;
+            case R.id.menu_item_reset_db:
+                // Delete the database
+                ClockDatabaseHelper.deleteAlarmsDb(this);
+
+                // Restart the app to repopulate db with default and recreate activities.
+                Intent mStartActivity = new Intent(this, DeskClock.class);
+                int mPendingIntentId = 123456;
+                PendingIntent mPendingIntent = PendingIntent.getActivity(this, mPendingIntentId,
+                        mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
+                AlarmManager mgr = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+                mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
+                System.exit(0);
+                return true;
             default:
                 break;
         }
@@ -364,7 +435,6 @@ public class DeskClock extends Activity implements LabelDialogFragment.TimerLabe
     /***
      * Adapter for wrapping together the ActionBar's tab with the ViewPager
      */
-
     private class TabsAdapter extends FragmentPagerAdapter
             implements ActionBar.TabListener, ViewPager.OnPageChangeListener {
 

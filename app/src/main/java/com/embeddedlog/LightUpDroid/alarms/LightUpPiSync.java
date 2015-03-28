@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 carlosperate
+ * Copyright (C) 2015 carlosperate http://carlosperate.github.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -37,16 +38,25 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Synchronises the Alarms with the LightUpPi server alarms by providing methods to retrieve, edit
  * add and delete alarms on the server.
+ *
  * TODO: This class is still under work, for now it retrieves the JSON data and prints it to the
  *       log. Committed before changes to the Alarm class are performed to integrate it with
- *       AlarmSync.
+ *       LightUpPiSync.
  */
-public class AlarmSync {
-    private static final String DEBUG_TAG = "AlarmSync";
+public class LightUpPiSync {
+    private static final boolean DEBUG = true;
+    private static final String LOG_TAG = "LightUpPiSync";
+
+    // Used to schedule a permanently running background LightUpPi server check
+    private ScheduledExecutorService scheduleServerCheck;
+
     private Context mContext;
 
     // This progress dialog is display in the input context during sycn
@@ -55,14 +65,16 @@ public class AlarmSync {
     /**
      * Public constructor. Saves the class context to be able to check the network connectivity
      * and display a progress dialog.
+     *
      * @param mContext Context of the activity requesting the sync.
      */
-    public AlarmSync(Context mContext){
+    public LightUpPiSync(Context mContext){
         this.mContext = mContext;
     }
 
     /**
      * Gets the LightUpPi server IP from the settings and returns the server address string.
+     *
      * @return Sever address to the LightUpPi app root folder.
      */
     private String getServerAddress() {
@@ -71,24 +83,26 @@ public class AlarmSync {
         String serverIP = prefs.getString(SettingsActivity.KEY_LIGHTUPPI_SERVER, "");
         // The LightUpPi server application runs through the LightUpPi directory
         String serverAddress = "http://" + serverIP + "/LightUpPi/";
-        Log.d(DEBUG_TAG, "LightUpPi app address: " + serverAddress);
+        if (DEBUG) Log.d(LOG_TAG, "LightUpPi server address: " + serverAddress);
         return serverAddress;
     }
 
     /**
      * Gets an alarm from the LightUpPi server.
+     *
      * @param alarmId LightUpPi Alarm ID of the alarm to retrieve.
      */
-    public void getAlarm(int alarmId) {
+    public void getServerAlarm(int alarmId) {
         String url = getServerAddress() + "alarm?action=get&id=" + alarmId;
         getJsonHandler(url);
     }
 
     /**
      * Deletes an alarm from the LightUpPi server.
+     *
      * @param alarmId LightUpPi Alarm ID of the alarm to retrieve.
      */
-    public void deleteAlarm(int alarmId) {
+    public void deleteServerAlarm(int alarmId) {
         String url = getServerAddress() + "alarm?action=delete&id=" + alarmId;
         getJsonHandler(url);
     }
@@ -96,7 +110,7 @@ public class AlarmSync {
     /**
      * Gets all the Alarms from the LightUpPi sever.
      */
-    public void getAllAlarms() {
+    public void getAllServerAlarms() {
         String url = getServerAddress() + "alarms";
         getJsonHandler(url);
     }
@@ -104,13 +118,13 @@ public class AlarmSync {
     /**
      * Every request is handled by this method, which launches an async task to retrieve the data.
      * Before attempting to fetch the URL, makes sure that there is a network connection.
+     *
      * @param urlString The URL of the JSON data to retrieve.
-     * @return String with the JSON data, or null if there is no network connectivity
      */
     private void getJsonHandler(String urlString) {
         // We need the context manager and
-        ConnectivityManager connMgr = (ConnectivityManager)
-                mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connMgr =
+                (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
             new DownloadJsonTask().execute(urlString);
@@ -118,7 +132,6 @@ public class AlarmSync {
             // TODO: probably do the callback with a 'no network connection' error message.
         }
     }
-
 
     /**
      * Uses AsyncTask to create a task away from the main UI thread, where the wrapper class is
@@ -159,17 +172,15 @@ public class AlarmSync {
 
         /**
          * onPostExecute closes the progress dialog and converts the data to JSONArray
-         * @param result
          */
         @Override
         protected void onPostExecute(String result) {
             // Close the progress dialog, and for debugging print data in log
             progress.dismiss();
-            Log.d(DEBUG_TAG, "json: " + result);
+            if (DEBUG) Log.d(LOG_TAG, "json: " + result);
 
             if (result == null) {
                 // Deal with the error
-                ;
             } else {
                 //parse JSON data
                 try {
@@ -186,6 +197,7 @@ public class AlarmSync {
         /**
          * Given a URL, establishes an HttpUrlConnection and retrieves the content as a
          * InputStream, which it returns as a string.
+         *
          * @param myurl String array containing as the first argument the URL to retrieve data from.
          * @return String with the URL data
          * @throws IOException
@@ -203,7 +215,7 @@ public class AlarmSync {
                 // Starts the query
                 conn.connect();
                 int response = conn.getResponseCode();
-                Log.d(DEBUG_TAG, "The response is: " + response);
+                if (DEBUG) Log.d(LOG_TAG, "The response is: " + response);
                 // TODO: Check the response, if not 200 we want to inform the user the server was
                 //       reached but the data was not as expected, probably not running LightUpPi
 
@@ -221,6 +233,7 @@ public class AlarmSync {
 
         /**
          * Converts the input stream from the web content into an String.
+         *
          * @param stream InputStream to be converted into String.
          * @return String with the stream parameter data.
          * @throws IOException
@@ -236,5 +249,61 @@ public class AlarmSync {
             }
             return out.toString();
         }
+    }
+
+    /**
+     * Initiates a background thread to check if the LightUpPi server is reachable.
+     * @param guiHandler Handler for the activity GUI, for which to send one of the two runnables.
+     * @param online Runnable to execute in the Handler if the server is online.
+     * @param offline Runnable to execute in the Handler if the server is offline.
+     */
+    public void startBackgroundServerCheck(final Handler guiHandler, final Runnable online,
+                                           final Runnable offline) {
+        final String serverAddress = getServerAddress();
+        // Check for network connectivity
+        ConnectivityManager connMgr =
+                (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if ((networkInfo != null) && networkInfo.isConnected() &&
+                ((scheduleServerCheck == null) || scheduleServerCheck.isShutdown())) {
+            // Schedule the background server check
+            scheduleServerCheck = Executors.newScheduledThreadPool(1);
+            scheduleServerCheck.scheduleWithFixedDelay(new Runnable() {
+                public void run() {
+                    int response = 0;
+                    try {
+                        URL url = new URL(serverAddress);
+                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                        conn.setReadTimeout(10000);    /* milliseconds */
+                        conn.setConnectTimeout(15000); /* milliseconds */
+                        conn.setRequestMethod("GET");
+                        conn.setDoInput(true);
+                        conn.connect();
+                        response = conn.getResponseCode();
+                    } catch (Exception e) {
+                        // Ignored as a non-200 value for response will trigger the offline title
+                    }
+                    if (response == 200) {
+                        if (DEBUG) Log.d(LOG_TAG, "Response 200");
+                        guiHandler.post(online);
+                    } else {
+                        if (DEBUG) Log.d(LOG_TAG, "Response NOT 200");
+                        guiHandler.post(offline);
+                    }
+                }
+            }, 0, 30, TimeUnit.SECONDS);
+            if (DEBUG) Log.d(LOG_TAG, "BackgroundServerCheck started");
+        } else {
+            if (DEBUG) Log.d(LOG_TAG, "Response NOT 200");
+            guiHandler.post(offline);
+        }
+    }
+
+    /**
+     * Stops the background server check
+     */
+    public void stopBackgroundServerCheck() {
+        if (DEBUG) Log.d(LOG_TAG, "BackgroundServerCheck stopped");
+        scheduleServerCheck.shutdown();
     }
 }

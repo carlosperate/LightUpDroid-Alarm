@@ -33,7 +33,7 @@ import java.util.Calendar;
  * Helper class for opening the database from multiple providers.  Also provides
  * some common functionality.
  */
-class ClockDatabaseHelper extends SQLiteOpenHelper {
+public class ClockDatabaseHelper extends SQLiteOpenHelper {
     /**
      * Original Clock Database.
      **/
@@ -117,6 +117,10 @@ class ClockDatabaseHelper extends SQLiteOpenHelper {
                 ClockContract.CitiesColumns.TIMEZONE_NAME + " TEXT NOT NULL, " +
                 ClockContract.CitiesColumns.TIMEZONE_OFFSET + " INTEGER NOT NULL);");
         Log.i("Cities table created");
+    }
+
+    public static void deleteAlarmsDb(Context context) {
+        context.deleteDatabase(DATABASE_NAME);
     }
 
     private Context mContext;

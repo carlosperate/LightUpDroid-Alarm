@@ -826,5 +826,10 @@
     <string name="lightuppi_invalid_ip">Invalid IP entered, original kept !</string>
     <string name="lightuppi_syncing_title">Syncing Alarms</string>
     <string name="lightuppi_syncing_body">Retrieving alarms from LightUpPi server</string>
+    <!-- Menu items on Alarm fragment screen -->
+    <string name="menu_item_sync_lightuppi">Sync with LightUpPi</string>
+    <string name="menu_item_reset_db">Reset database</string>
+    <string name="menu_item_push_to_lightuppi">Push Alarms to LightUpPi</string>
+    <string name="menu_item_push_to_phone">Push Alarms to phone</string>
 </resources>
 
