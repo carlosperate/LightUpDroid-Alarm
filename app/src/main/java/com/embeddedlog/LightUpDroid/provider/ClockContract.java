@@ -131,6 +131,12 @@ public final class ClockContract {
          * <p>Type: INTEGER</p>
          */
         public static final String LIGHTUPPI_ID = "lightuppi_id";
+
+        /**
+         * The timestamp, in seconds since 1970, of the last time this alarm was modified.
+         * <p>Type: LONG</p>
+         */
+        public static final String TIMESTAMP = "timestamp";
     }
 
     /**
@@ -253,6 +259,12 @@ public final class ClockContract {
          * <p>Type: INTEGER (long)</p>
          */
         public static final String LIGHTUPPI_ID = "lightuppi_id";
+
+        /**
+         * Timestamp of the last time this alarm was modified, in seconds from 1970
+         * <p>Type: INTEGER (long)</p>
+         */
+        public static final String TIMESTAMP = "timestamp";
 
         /**
          * Alarm state

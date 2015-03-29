@@ -36,9 +36,10 @@ import java.util.List;
 
 public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
     /**
-     * Alarms start with an invalid id when it hasn't been saved to the database.
+     * Alarms start with an invalid id and timestamp when it hasn't been saved to the database.
      */
     public static final long INVALID_ID = -1;
+    public static final long INVALID_TIMESTAMP = -1;
 
     /**
      * The default sort order for this table
@@ -58,7 +59,8 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
             LABEL,
             RINGTONE,
             DELETE_AFTER_USE,
-            LIGHTUPPI_ID
+            LIGHTUPPI_ID,
+            TIMESTAMP
     };
 
     /**
@@ -75,8 +77,9 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
     private static final int RINGTONE_INDEX = 7;
     private static final int DELETE_AFTER_USE_INDEX = 8;
     private static final int LIGHTUPPI_ID_INDEX = 9;
+    private static final int TIMESTAMP_INDEX = 10;
 
-    private static final int COLUMN_COUNT = LIGHTUPPI_ID_INDEX + 1;
+    private static final int COLUMN_COUNT = TIMESTAMP_INDEX + 1;
 
     public static ContentValues createContentValues(Alarm alarm) {
         ContentValues values = new ContentValues(COLUMN_COUNT);
@@ -92,6 +95,7 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
         values.put(LABEL, alarm.label);
         values.put(DELETE_AFTER_USE, alarm.deleteAfterUse);
         values.put(LIGHTUPPI_ID, alarm.lightuppiId);
+        values.put(TIMESTAMP, alarm.timestamp);
         if (alarm.alert == null) {
             // We want to put null, so default alarm changes
             values.putNull(RINGTONE);
@@ -203,6 +207,7 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
 
     public static Alarm addAlarm(ContentResolver contentResolver, Alarm alarm) {
         ContentValues values = createContentValues(alarm);
+        alarm.timestamp = (long)(System.currentTimeMillis()/1000);
         Uri uri = contentResolver.insert(CONTENT_URI, values);
         alarm.id = getId(uri);
         return alarm;
@@ -210,6 +215,7 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
 
     public static boolean updateAlarm(ContentResolver contentResolver, Alarm alarm) {
         if (alarm.id == Alarm.INVALID_ID) return false;
+        alarm.timestamp = (long)(System.currentTimeMillis()/1000);
         ContentValues values = createContentValues(alarm);
         long rowsUpdated = contentResolver.update(getUri(alarm.id), values, null, null);
         return rowsUpdated == 1;
@@ -242,6 +248,7 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
     public Uri alert;
     public boolean deleteAfterUse;
     public long lightuppiId;
+    public long timestamp;
 
     // Creates a default alarm at the current time.
     public Alarm() {
@@ -258,6 +265,8 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
         this.label = "";
         this.alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
         this.deleteAfterUse = false;
+        this.lightuppiId = INVALID_ID;
+        this.timestamp = INVALID_TIMESTAMP;
     }
 
     public Alarm(Cursor c) {
@@ -270,6 +279,7 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
         label = c.getString(LABEL_INDEX);
         deleteAfterUse = c.getInt(DELETE_AFTER_USE_INDEX) == 1;
         lightuppiId = c.getLong(LIGHTUPPI_ID_INDEX);
+        timestamp = c.getLong(TIMESTAMP_INDEX);
 
         if (c.isNull(RINGTONE_INDEX)) {
             // Should we be saving this with the current ringtone or leave it null
@@ -291,6 +301,7 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
         alert = (Uri) p.readParcelable(null);
         deleteAfterUse = p.readInt() == 1;
         lightuppiId = p.readLong();
+        timestamp = p.readLong();
     }
 
     public String getLabelOrDefault(Context context) {
@@ -311,6 +322,7 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
         p.writeParcelable(alert, flags);
         p.writeInt(deleteAfterUse ? 1 : 0);
         p.writeLong(lightuppiId);
+        p.writeLong(timestamp);
     }
 
     public int describeContents() {
@@ -343,6 +355,7 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
         result.mLabel = label;
         result.mRingtone = alert;
         result.mLightuppiId = lightuppiId;
+        result.mTimestamp = timestamp;
         return result;
     }
 
@@ -371,6 +384,7 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
                 ", label='" + label + '\'' +
                 ", deleteAfterUse=" + deleteAfterUse +
                 ", lightuppiId=" + lightuppiId +
+                ", timestamp=" + timestamp +
                 '}';
     }
 }

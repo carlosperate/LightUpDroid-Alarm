@@ -58,15 +58,11 @@ public class ClockDatabaseHelper extends SQLiteOpenHelper {
     private static final int VERSION_7 = 9;
 
     /**
-     * Added LightUpPi alarm ID to instance table.
+     * 1: Added LightUpPi alarm ID to alarms table.
+     * 2: Added timestamp to the alarms table.
      */
     private static final int VERSION_LIGHTUPPI_1 = 10;
-
-    // This creates a default alarm at 8:30 for every Mon,Tue,Wed,Thu,Fri
-    private static final String DEFAULT_ALARM_1 = "(8, 30, 31, 0, 0, '', NULL, 0, 0);";
-
-    // This creates a default alarm at 10:15 for every Sat,Sun
-    private static final String DEFAULT_ALARM_2 = "(10, 15, 96, 0, 0, '', NULL, 0, 0);";
+    private static final int VERSION_LIGHTUPPI_2 = 11;
 
     // Database and table names
     static final String DATABASE_NAME = "alarms.db";
@@ -86,7 +82,8 @@ public class ClockDatabaseHelper extends SQLiteOpenHelper {
                 ClockContract.AlarmsColumns.LABEL + " TEXT NOT NULL, " +
                 ClockContract.AlarmsColumns.RINGTONE + " TEXT, " +
                 ClockContract.AlarmsColumns.DELETE_AFTER_USE + " INTEGER NOT NULL DEFAULT 0," +
-                ClockContract.AlarmsColumns.LIGHTUPPI_ID + " INTEGER NOT NULL);");
+                ClockContract.AlarmsColumns.LIGHTUPPI_ID + " INTEGER NOT NULL," +
+                ClockContract.AlarmsColumns.TIMESTAMP + " INTEGER NOT NULL);");
         Log.i("Alarms Table created");
     }
 
@@ -103,6 +100,7 @@ public class ClockDatabaseHelper extends SQLiteOpenHelper {
                 ClockContract.InstancesColumns.RINGTONE + " TEXT, " +
                 ClockContract.InstancesColumns.ALARM_STATE + " INTEGER NOT NULL, " +
                 ClockContract.InstancesColumns.LIGHTUPPI_ID + " INTEGER NOT NULL, " +
+                ClockContract.InstancesColumns.TIMESTAMP + " INTEGER NOT NULL, " +
                 ClockContract.InstancesColumns.ALARM_ID + " INTEGER REFERENCES " +
                     ALARMS_TABLE_NAME + "(" + ClockContract.AlarmsColumns._ID + ") " +
                     "ON UPDATE CASCADE ON DELETE CASCADE" +
@@ -148,7 +146,15 @@ public class ClockDatabaseHelper extends SQLiteOpenHelper {
                 ClockContract.AlarmsColumns.LABEL + cs +
                 ClockContract.AlarmsColumns.RINGTONE + cs +
                 ClockContract.AlarmsColumns.DELETE_AFTER_USE + cs +
-                ClockContract.AlarmsColumns.LIGHTUPPI_ID + ") VALUES ";
+                ClockContract.AlarmsColumns.LIGHTUPPI_ID + cs +
+                ClockContract.AlarmsColumns.TIMESTAMP + ") VALUES ";
+
+        long timestamp = (long)(System.currentTimeMillis()/1000);
+
+        // This creates a default alarm at 8:30 for every Mon,Tue,Wed,Thu,Fri
+        final String DEFAULT_ALARM_1 = "(8, 30, 31, 0, 0, '', NULL, 0, -1, " + timestamp + ");";
+        // This creates a default alarm at 10:15 for every Sat,Sun
+        final String DEFAULT_ALARM_2 = "(10, 15, 96, 0, 0, '', NULL, 0, -1, " + timestamp + ");";
         db.execSQL(insertMe + DEFAULT_ALARM_1);
         db.execSQL(insertMe + DEFAULT_ALARM_2);
     }

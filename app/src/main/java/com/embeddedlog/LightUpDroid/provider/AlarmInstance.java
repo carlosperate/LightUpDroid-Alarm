@@ -56,9 +56,10 @@ public final class AlarmInstance implements ClockContract.InstancesColumns {
     private static final String DEFAULT_ALARM_TIMEOUT_SETTING = "10";
 
     /**
-     * AlarmInstances start with an invalid id when it hasn't been saved to the database.
+     * AlarmInstances start with invalid id and timestamp when it hasn't been saved to the database.
      */
     public static final long INVALID_ID = -1;
+    public static final long INVALID_TIMESTAMP = -1;
 
     private static final String[] QUERY_COLUMNS = {
             _ID,
@@ -72,7 +73,8 @@ public final class AlarmInstance implements ClockContract.InstancesColumns {
             RINGTONE,
             ALARM_ID,
             ALARM_STATE,
-            LIGHTUPPI_ID
+            LIGHTUPPI_ID,
+            TIMESTAMP
     };
 
     /**
@@ -91,8 +93,9 @@ public final class AlarmInstance implements ClockContract.InstancesColumns {
     private static final int ALARM_ID_INDEX = 9;
     private static final int ALARM_STATE_INDEX = 10;
     private static final int LIGHTUPPI_ID_INDEX = 11;
+    private static final int TIMESTAMP_INDEX = 12;
 
-    private static final int COLUMN_COUNT = LIGHTUPPI_ID_INDEX + 1;
+    private static final int COLUMN_COUNT = TIMESTAMP_INDEX + 1;
     private Calendar mTimeout;
 
     public static ContentValues createContentValues(AlarmInstance instance) {
@@ -118,6 +121,7 @@ public final class AlarmInstance implements ClockContract.InstancesColumns {
         values.put(ALARM_ID, instance.mAlarmId);
         values.put(ALARM_STATE, instance.mAlarmState);
         values.put(LIGHTUPPI_ID, instance.mLightuppiId);
+        values.put(TIMESTAMP, instance.mTimestamp);
         return values;
     }
 
@@ -269,6 +273,7 @@ public final class AlarmInstance implements ClockContract.InstancesColumns {
     public Long mAlarmId;
     public int mAlarmState;
     public Long mLightuppiId;
+    public Long mTimestamp;
 
     public AlarmInstance(Calendar calendar, Long alarmId) {
         this(calendar);
@@ -277,12 +282,13 @@ public final class AlarmInstance implements ClockContract.InstancesColumns {
 
     public AlarmInstance(Calendar calendar) {
         mId = INVALID_ID;
-        mLightuppiId = null;
         setAlarmTime(calendar);
         mLabel = "";
         mVibrate = false;
         mRingtone = null;
         mAlarmState = SILENT_STATE;
+        mLightuppiId = INVALID_ID;
+        mTimestamp = INVALID_TIMESTAMP;
     }
 
     public AlarmInstance(Cursor c) {
@@ -309,6 +315,9 @@ public final class AlarmInstance implements ClockContract.InstancesColumns {
 
         if (!c.isNull(LIGHTUPPI_ID_INDEX)) {
             mLightuppiId = c.getLong(LIGHTUPPI_ID_INDEX);
+        }
+        if (!c.isNull(TIMESTAMP_INDEX)) {
+            mTimestamp = c.getLong(TIMESTAMP_INDEX);
         }
     }
 
@@ -422,6 +431,7 @@ public final class AlarmInstance implements ClockContract.InstancesColumns {
                 ", mAlarmId=" + mAlarmId +
                 ", mLightuppiId=" + mLightuppiId +
                 ", mAlarmState=" + mAlarmState +
+                ", mTimestamp=" + mTimestamp+
                 '}';
     }
 }
