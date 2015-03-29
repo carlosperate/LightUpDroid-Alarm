@@ -24,6 +24,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.embeddedlog.LightUpDroid.Log;
@@ -235,5 +236,13 @@ public class ClockProvider extends ContentProvider {
 
         getContext().getContentResolver().notifyChange(uri, null);
         return count;
+    }
+
+    @Override
+    public Bundle call(String method, String arg, Bundle extras) {
+        if (method.equals("resetAlarmTables")) {
+            mOpenHelper.resetAlarmTables();
+        }
+        return null;
     }
 }

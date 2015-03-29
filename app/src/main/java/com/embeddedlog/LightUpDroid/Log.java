@@ -24,11 +24,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Log {
-    public final static String LOGTAG = "AlarmClock";
+    public final static String LOGTAG = "LightUpDroid";
 
     /** This must be false for production.  If true, turns on logging,
      test code, etc. */
-    public static final boolean LOGV = false;
+    public static final boolean LOGV = true;
 
     public static void d(String logMe) {
         android.util.Log.d(LOGTAG, logMe);

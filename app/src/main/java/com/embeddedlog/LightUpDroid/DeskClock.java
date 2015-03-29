@@ -25,10 +25,12 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -48,7 +50,7 @@ import android.widget.TextView;
 import com.embeddedlog.LightUpDroid.alarms.AlarmStateManager;
 import com.embeddedlog.LightUpDroid.alarms.LightUpPiSync;
 import com.embeddedlog.LightUpDroid.provider.Alarm;
-import com.embeddedlog.LightUpDroid.provider.ClockDatabaseHelper;
+import com.embeddedlog.LightUpDroid.provider.ClockContract;
 import com.embeddedlog.LightUpDroid.stopwatch.StopwatchService;
 import com.embeddedlog.LightUpDroid.stopwatch.Stopwatches;
 import com.embeddedlog.LightUpDroid.timer.TimerFragment;
@@ -386,7 +388,9 @@ public class DeskClock extends Activity implements LabelDialogFragment.TimerLabe
                 return true;
             case R.id.menu_item_reset_db:
                 // Delete the database
-                ClockDatabaseHelper.deleteAlarmsDb(this);
+                ContentResolver cr = this.getContentResolver();
+                cr.call(Uri.parse("content://" + ClockContract.AUTHORITY),
+                        "resetAlarmTables", null, null);
 
                 // Restart the app to repopulate db with default and recreate activities.
                 Intent mStartActivity = new Intent(this, DeskClock.class);
