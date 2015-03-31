@@ -820,16 +820,24 @@
     <!-- LightUpPi name -->
     <string name="lightuppi">LightUpPi</string>
     <string name="lightuppi_alarm">LightUpPi Alarm</string>
+    <!-- LightUpPi settings strings -->
     <string name="lightuppi_set_server">LightUpPi server address</string>
     <string name="lightuppi_keep_new_alarms">Keep new phone alarms on sync</string>
     <string name="lightuppi_keep_new_alarms_summary">When syncing with the LightUpPi server, ensure the new alarms created offline are maintained</string>
     <string name="lightuppi_invalid_ip">Invalid IP entered, original kept !</string>
-    <string name="lightuppi_syncing_title">Syncing Alarms</string>
-    <string name="lightuppi_syncing_body">Retrieving alarms from LightUpPi server</string>
     <!-- Menu items on Alarm fragment screen -->
     <string name="menu_item_sync_lightuppi">Sync with LightUpPi</string>
     <string name="menu_item_reset_db">Reset Alarm database</string>
     <string name="menu_item_push_to_lightuppi">Push Alarms to LightUpPi</string>
     <string name="menu_item_push_to_phone">Push Alarms to phone</string>
+    <!-- Toast messages for LightUpPi server actions -->
+    <string name="lightuppi_syncing_message">Syncing with LightUpPi server</string>
+    <string name="lightuppi_sync_fail">LightUpPi Sync failed</string>
+    <string name="lightuppi_no_connection">Sync failed, no network connection</string>
+    <string name="lightuppi_add_successful">LightUpPi Alarm successfully added</string>
+    <string name="lightuppi_add_unsuccessful">LightUpPi Alarm edit UNSUCCESSFUL</string>
+    <string name="lightuppi_edit_successful">LightUpPi Alarm successfully edited</string>
+    <string name="lightuppi_edit_unsuccessful">LightUpPi Alarm edit UNSUCCESSFUL</string>
+    <string name="lightuppi_delete_successful">LightUpPi Alarm successfully deleted</string>
+    <string name="lightuppi_delete_unsuccessful">LightUpPi Alarm delete UNSUCCESSFUL</string>
 </resources>
-

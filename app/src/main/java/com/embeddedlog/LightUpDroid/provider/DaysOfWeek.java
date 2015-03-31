@@ -159,6 +159,35 @@ public final class DaysOfWeek {
         return mBitSet != NO_DAYS_SET;
     }
 
+
+    public boolean isMondayEnabled() {
+        return isBitEnabled(0x1);
+    }
+
+    public boolean isTuesdayEnabled() {
+        return isBitEnabled(0x02);
+    }
+
+    public boolean isWednesdayEnabled() {
+        return isBitEnabled(0x04);
+    }
+
+    public boolean isThursdayEnabled() {
+        return isBitEnabled(0x08);
+    }
+
+    public boolean isFridayEnabled() {
+        return isBitEnabled(0x10);
+    }
+
+    public boolean isSaturdayEnabled() {
+        return isBitEnabled(0x20);
+    }
+
+    public boolean isSundayEnabled() {
+        return isBitEnabled(0x40);
+    }
+
     /**
      * Returns number of days from today until next alarm.
      *

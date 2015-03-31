@@ -28,9 +28,11 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.embeddedlog.LightUpDroid.Log;
 import com.embeddedlog.LightUpDroid.R;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -168,7 +170,21 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
      * @return alarm if found, null otherwise
      */
     public static Alarm getAlarmLightuppiId(ContentResolver contentResolver, long lightuppiId) {
-        return null;
+        Cursor cursor = contentResolver.query(
+                CONTENT_URI, QUERY_COLUMNS, Alarm.LIGHTUPPI_ID + "=" + lightuppiId, null, null);
+        if (cursor == null) {
+            return null;
+        }
+
+        Alarm result = null;
+        try {
+            if (cursor.moveToFirst()) {
+                result = new Alarm(cursor);
+            }
+        } finally {
+            cursor.close();
+        }
+        return result;
     }
 
     /**
@@ -207,15 +223,23 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
 
     public static Alarm addAlarm(ContentResolver contentResolver, Alarm alarm) {
         ContentValues values = createContentValues(alarm);
-        alarm.timestamp = (long)(System.currentTimeMillis()/1000);
+        // Timestamp is used mostly to be able to synchronised alarms, so if it already contains
+        // a specified timestamp, keep it.
+        if (alarm.timestamp == INVALID_TIMESTAMP) {
+            alarm.timestamp = (long)(System.currentTimeMillis()/1000);
+        }
         Uri uri = contentResolver.insert(CONTENT_URI, values);
         alarm.id = getId(uri);
         return alarm;
     }
 
-    public static boolean updateAlarm(ContentResolver contentResolver, Alarm alarm) {
+    public static boolean updateAlarm(
+            ContentResolver contentResolver, Alarm alarm, final boolean... bypassTimestamp) {
         if (alarm.id == Alarm.INVALID_ID) return false;
-        alarm.timestamp = (long)(System.currentTimeMillis()/1000);
+        if (bypassTimestamp.length <= 0 || !bypassTimestamp[0]) {
+            alarm.timestamp = (long) (System.currentTimeMillis() / 1000);
+            if (Log.LOGV) Log.d("Alarm " + alarm.id + "/" + alarm.lightuppiId + " new timestamp");
+        }
         ContentValues values = createContentValues(alarm);
         long rowsUpdated = contentResolver.update(getUri(alarm.id), values, null, null);
         return rowsUpdated == 1;
@@ -373,6 +397,7 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
 
     @Override
     public String toString() {
+        Date timestampDate = new Date(timestamp * 1000);
         return "Alarm{" +
                 "alert=" + alert +
                 ", id=" + id +
@@ -384,7 +409,7 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
                 ", label='" + label + '\'' +
                 ", deleteAfterUse=" + deleteAfterUse +
                 ", lightuppiId=" + lightuppiId +
-                ", timestamp=" + timestamp +
+                ", timestamp=" + timestampDate.toString() +
                 '}';
     }
 }

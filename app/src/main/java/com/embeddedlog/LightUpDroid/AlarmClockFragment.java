@@ -67,6 +67,7 @@ import android.widget.ToggleButton;
 import com.android.datetimepicker.time.RadialPickerLayout;
 import com.android.datetimepicker.time.TimePickerDialog;
 import com.embeddedlog.LightUpDroid.alarms.AlarmStateManager;
+import com.embeddedlog.LightUpDroid.alarms.LightUpPiSync;
 import com.embeddedlog.LightUpDroid.provider.Alarm;
 import com.embeddedlog.LightUpDroid.provider.AlarmInstance;
 import com.embeddedlog.LightUpDroid.provider.DaysOfWeek;
@@ -76,6 +77,7 @@ import com.embeddedlog.LightUpDroid.widget.TextTime;
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
 import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -84,8 +86,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class AlarmClockFragment extends DeskClockFragment implements
         LoaderManager.LoaderCallbacks<Cursor>,
         TimePickerDialog.OnTimeSetListener,
-        View.OnTouchListener
-        {
+        View.OnTouchListener {
     private static final float EXPAND_DECELERATION = 1f;
     private static final float COLLAPSE_DECELERATION = 0.7f;
     private static final int ANIMATION_DURATION = 300;
@@ -302,6 +303,7 @@ public class AlarmClockFragment extends DeskClockFragment implements
 
                 // If there are no alarms in the adapter...
                 if (count == 0) {
+                    // TODO: change this to the new color scheme
                     mAddAlarmButton.setBackgroundResource(R.drawable.main_button_red);
 
                     // ...and if there exists a timeline view (currently only in tablet landscape)
@@ -553,6 +555,7 @@ public class AlarmClockFragment extends DeskClockFragment implements
             a.hour = hourOfDay;
             a.minutes = minute;
             a.enabled = true;
+            // TODO: edit deleteAfterUse and setBitSet(DaysOfWeek.ALL_DAYS_SET) for default
             asyncAddAlarm(a);
         } else {
             mSelectedAlarm.hour = hourOfDay;
@@ -1716,7 +1719,13 @@ public class AlarmClockFragment extends DeskClockFragment implements
         return newInstance;
     }
 
-    private void asyncDeleteAlarm(final Alarm alarm, final View viewToRemove) {
+    protected static void getAllAlarms(Context context) {
+        ContentResolver cr = context.getContentResolver();
+        // Passing null as selection argument retrieves all alarms
+        List<Alarm> alarmList = Alarm.getAlarms(cr, null);
+    }
+
+    public void asyncDeleteAlarm(final Alarm alarm, final View viewToRemove) {
         final Context context = AlarmClockFragment.this.getActivity().getApplicationContext();
         final AsyncTask<Void, Void, Void> deleteTask = new AsyncTask<Void, Void, Void>() {
             @Override
@@ -1757,7 +1766,7 @@ public class AlarmClockFragment extends DeskClockFragment implements
         deleteTask.execute();
     }
 
-    private void asyncAddAlarm(final Alarm alarm) {
+    public void asyncAddAlarm(final Alarm alarm) {
         final Context context = AlarmClockFragment.this.getActivity().getApplicationContext();
         final AsyncTask<Void, Void, AlarmInstance> updateTask =
                 new AsyncTask<Void, Void, AlarmInstance>() {
@@ -1806,7 +1815,8 @@ public class AlarmClockFragment extends DeskClockFragment implements
         updateTask.execute();
     }
 
-    private void asyncUpdateAlarm(final Alarm alarm, final boolean popToast) {
+    public void asyncUpdateAlarm(
+            final Alarm alarm, final boolean popToast, final boolean... bypassTimestamp) {
         final Context context = AlarmClockFragment.this.getActivity().getApplicationContext();
         final AsyncTask<Void, Void, AlarmInstance> updateTask =
                 new AsyncTask<Void, Void, AlarmInstance>() {
@@ -1817,8 +1827,15 @@ public class AlarmClockFragment extends DeskClockFragment implements
                 // Dismiss all old instances
                 AlarmStateManager.deleteAllInstances(context, alarm.id);
 
-                // Update alarm
-                Alarm.updateAlarm(cr, alarm);
+                // Update alarm, if bypassing the timestamp this is a request from LightUpPi server,
+                // so only need to update it when bypass is not requested
+                if (bypassTimestamp.length > 0 && bypassTimestamp[0]) {
+                    Alarm.updateAlarm(cr, alarm, true);
+                } else {
+                    Alarm.updateAlarm(cr, alarm);
+                    lightUpPiSyncEdit(alarm);
+                }
+
                 if (alarm.enabled) {
                     return setupAlarmInstance(context, alarm);
                 }
@@ -1840,5 +1857,9 @@ public class AlarmClockFragment extends DeskClockFragment implements
     public boolean onTouch(View v, MotionEvent event) {
         hideUndoBar(true, event);
         return false;
+    }
+
+    private void lightUpPiSyncEdit(Alarm alarm) {
+        new LightUpPiSync(getActivity(), this.getTag()).editServerAlarm(alarm);
     }
 }

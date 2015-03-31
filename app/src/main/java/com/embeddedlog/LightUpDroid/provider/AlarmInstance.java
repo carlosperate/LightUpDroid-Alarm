@@ -31,6 +31,7 @@ import com.embeddedlog.LightUpDroid.R;
 import com.embeddedlog.LightUpDroid.SettingsActivity;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -418,6 +419,7 @@ public final class AlarmInstance implements ClockContract.InstancesColumns {
 
     @Override
     public String toString() {
+        Date timestampDate = new Date(mTimestamp * 1000);
         return "AlarmInstance{" +
                 "mId=" + mId +
                 ", mYear=" + mYear +
@@ -431,7 +433,7 @@ public final class AlarmInstance implements ClockContract.InstancesColumns {
                 ", mAlarmId=" + mAlarmId +
                 ", mLightuppiId=" + mLightuppiId +
                 ", mAlarmState=" + mAlarmState +
-                ", mTimestamp=" + mTimestamp+
+                ", mTimestamp=" + timestampDate.toString() +
                 '}';
     }
 }

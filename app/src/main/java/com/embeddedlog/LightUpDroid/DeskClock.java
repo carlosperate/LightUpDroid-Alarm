@@ -79,7 +79,7 @@ public class DeskClock extends Activity implements LabelDialogFragment.TimerLabe
 
     public static final String SELECT_TAB_INTENT_EXTRA = "LightUpDroid.select.tab";
 
-    private LightUpPiSync mLightUpPiSync;
+    private LightUpPiSync mLightUpPiBackgroundCheck;
 
     private ActionBar mActionBar;
     private Tab mAlarmTab;
@@ -106,14 +106,14 @@ public class DeskClock extends Activity implements LabelDialogFragment.TimerLabe
 
     // Handler and runnables for setting the action bar title based on LightUpPi server status
     final Handler mHandler = new Handler();
+    final Runnable lightUpPiOffline = new Runnable() {
+        public void run() {
+            mActionBar.setTitle(Html.fromHtml("LightUpPi <font color='#ff0000'>OFFLINE</font>"));
+        }
+    };
     final Runnable lightUpPiOnline = new Runnable() {
         public void run() {
             mActionBar.setTitle("LightUpPi ONLINE");
-        }
-    };
-    final Runnable lightUpPiOffline = new Runnable() {
-        public void run() {
-            mActionBar.setTitle(Html.fromHtml("<font color='#ff0000'>OFFLINE </font>"));
         }
     };
 
@@ -228,8 +228,9 @@ public class DeskClock extends Activity implements LabelDialogFragment.TimerLabe
         AlarmStateManager.updateNextAlarm(this);
 
         // Instantiate the LightUpPiSync and start checking if the server is up
-        mLightUpPiSync = new LightUpPiSync(this);
-        mLightUpPiSync.startBackgroundServerCheck(mHandler, lightUpPiOnline, lightUpPiOffline);
+        String correctString = "android:switcher:" + mViewPager.getId() + ":" + ALARM_TAB_INDEX;
+        mLightUpPiBackgroundCheck = new LightUpPiSync(this, correctString);
+        mLightUpPiBackgroundCheck.startBackgroundServerCheck(mHandler, lightUpPiOnline, lightUpPiOffline);
     }
 
     @Override
@@ -251,7 +252,7 @@ public class DeskClock extends Activity implements LabelDialogFragment.TimerLabe
         timerIntent.setAction(Timers.NOTIF_IN_USE_CANCEL);
         sendBroadcast(timerIntent);
 
-        mLightUpPiSync.startBackgroundServerCheck(mHandler, lightUpPiOnline, lightUpPiOffline);
+        mLightUpPiBackgroundCheck.startBackgroundServerCheck(mHandler, lightUpPiOnline, lightUpPiOffline);
     }
 
     @Override
@@ -266,7 +267,7 @@ public class DeskClock extends Activity implements LabelDialogFragment.TimerLabe
         editor.apply();
         Utils.showInUseNotifications(this);
 
-        mLightUpPiSync.stopBackgroundServerCheck();
+        mLightUpPiBackgroundCheck.stopBackgroundServerCheck();
 
         super.onPause();
     }
@@ -377,14 +378,14 @@ public class DeskClock extends Activity implements LabelDialogFragment.TimerLabe
                 startActivity(new Intent(DeskClock.this, ScreensaverActivity.class));
             case R.id.menu_item_sync_lightuppi:
                 // TODO: update LightUpPiSync to actually sync alarms and then update this bit
-                mLightUpPiSync.getAllServerAlarms();
                 return true;
             case R.id.menu_item_push_to_lightuppi:
                 // TODO: update LightUpPiSync to actually push alarms and then update this bit
-                mLightUpPiSync.getAllServerAlarms();
                 return true;
             case R.id.menu_item_push_to_phone:
                 // TODO: update LightUpPiSync to actually push alarms and then update this bit
+                String correctString = "android:switcher:" + mViewPager.getId() + ":" + ALARM_TAB_INDEX;
+                new LightUpPiSync(this, correctString).syncPushToPhone();
                 return true;
             case R.id.menu_item_reset_db:
                 // Delete the database
@@ -407,7 +408,7 @@ public class DeskClock extends Activity implements LabelDialogFragment.TimerLabe
         return true;
     }
 
-    /***
+    /**
      * Insert the local time zone as the Home Time Zone if one is not set
      */
     private void setHomeTimeZone() {
@@ -436,7 +437,7 @@ public class DeskClock extends Activity implements LabelDialogFragment.TimerLabe
     }
 
 
-    /***
+    /**
      * Adapter for wrapping together the ActionBar's tab with the ViewPager
      */
     private class TabsAdapter extends FragmentPagerAdapter
