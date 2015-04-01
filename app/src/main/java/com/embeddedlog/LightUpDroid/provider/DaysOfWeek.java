@@ -161,31 +161,31 @@ public final class DaysOfWeek {
 
 
     public boolean isMondayEnabled() {
-        return isBitEnabled(0x1);
+        return isBitEnabled(0);
     }
 
     public boolean isTuesdayEnabled() {
-        return isBitEnabled(0x02);
+        return isBitEnabled(1);
     }
 
     public boolean isWednesdayEnabled() {
-        return isBitEnabled(0x04);
+        return isBitEnabled(2);
     }
 
     public boolean isThursdayEnabled() {
-        return isBitEnabled(0x08);
+        return isBitEnabled(3);
     }
 
     public boolean isFridayEnabled() {
-        return isBitEnabled(0x10);
+        return isBitEnabled(4);
     }
 
     public boolean isSaturdayEnabled() {
-        return isBitEnabled(0x20);
+        return isBitEnabled(5);
     }
 
     public boolean isSundayEnabled() {
-        return isBitEnabled(0x40);
+        return isBitEnabled(6);
     }
 
     /**
