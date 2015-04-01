@@ -1758,6 +1758,7 @@ public class AlarmClockFragment extends DeskClockFragment implements
                     ContentResolver cr = context.getContentResolver();
                     AlarmStateManager.deleteAllInstances(context, alarm.id);
                     Alarm.deleteAlarm(cr, alarm.id);
+                    newLightUpPiSync().deleteServerAlarm(alarm);
                 }
                 return null;
             }
@@ -1795,6 +1796,7 @@ public class AlarmClockFragment extends DeskClockFragment implements
 
                     // Add alarm to db
                     Alarm newAlarm = Alarm.addAlarm(cr, alarm);
+                    newLightUpPiSync().addServerAlarm(alarm);
                     mScrollToAlarmId = newAlarm.id;
 
                     // Create and add instance to db
@@ -1833,7 +1835,7 @@ public class AlarmClockFragment extends DeskClockFragment implements
                     Alarm.updateAlarm(cr, alarm, true);
                 } else {
                     Alarm.updateAlarm(cr, alarm);
-                    lightUpPiSyncEdit(alarm);
+                    newLightUpPiSync().editServerAlarm(alarm);
                 }
 
                 if (alarm.enabled) {
@@ -1859,7 +1861,7 @@ public class AlarmClockFragment extends DeskClockFragment implements
         return false;
     }
 
-    private void lightUpPiSyncEdit(Alarm alarm) {
-        new LightUpPiSync(getActivity(), this.getTag()).editServerAlarm(alarm);
+    private LightUpPiSync newLightUpPiSync() {
+        return new LightUpPiSync(getActivity(), this.getTag());
     }
 }

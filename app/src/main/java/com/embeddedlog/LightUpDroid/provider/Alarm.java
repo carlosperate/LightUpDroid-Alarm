@@ -161,9 +161,7 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
     }
 
     /**
-     * Get alarm by LightUp Pi ID.
-     *
-     * TODO: actually make this work
+     * Get alarm by LightUpPi ID.
      *
      * @param contentResolver to perform the query on.
      * @param lightuppiId ID for the LightUpPi alarm to find.

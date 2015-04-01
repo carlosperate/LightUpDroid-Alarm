@@ -96,7 +96,7 @@ public class LightUpPiSync {
         Uri.Builder allAlarmsUri= getServerUriBuilder();
         allAlarmsUri.appendPath("getAlarm")
                 .appendQueryParameter("id", "all");
-        getJsonHandler(allAlarmsUri, TaskType.PUSH_TO_PHONE);
+        getJsonHandler(allAlarmsUri, TaskType.PUSH_TO_PHONE, Alarm.INVALID_ID);
     }
 
     private void syncPushToPhoneCallback(JSONObject jAllAlarms) {
@@ -146,6 +146,70 @@ public class LightUpPiSync {
     }
 
     /**
+     * Adds an alarm to the LightUpPi server.
+     *
+     * @param alarm New Alarm to add to LightUpPi server.
+     */
+    public void addServerAlarm(Alarm alarm) {
+        // First check if alarm has no associated LightUpPi server ID
+        if (alarm.lightuppiId == Alarm.INVALID_ID) {
+            Uri.Builder addAlarmUri= getServerUriBuilder();
+            addAlarmUri.appendPath("addAlarm")
+                    .appendQueryParameter("hour", Integer.toString(alarm.hour))
+                    .appendQueryParameter("minute", Integer.toString(alarm.minutes))
+                    .appendQueryParameter("monday",
+                            Boolean.toString(alarm.daysOfWeek.isMondayEnabled()))
+                    .appendQueryParameter("tuesday",
+                            Boolean.toString(alarm.daysOfWeek.isTuesdayEnabled()))
+                    .appendQueryParameter("wednesday",
+                            Boolean.toString(alarm.daysOfWeek.isWednesdayEnabled()))
+                    .appendQueryParameter("thursday",
+                            Boolean.toString(alarm.daysOfWeek.isThursdayEnabled()))
+                    .appendQueryParameter("friday",
+                            Boolean.toString(alarm.daysOfWeek.isFridayEnabled()))
+                    .appendQueryParameter("saturday",
+                            Boolean.toString(alarm.daysOfWeek.isSaturdayEnabled()))
+                    .appendQueryParameter("sunday",
+                            Boolean.toString(alarm.daysOfWeek.isSundayEnabled()))
+                    .appendQueryParameter("enabled", Boolean.toString(alarm.enabled))
+                    .appendQueryParameter("label", alarm.label)
+                    .appendQueryParameter("timestamp", Long.toString(alarm.timestamp));
+            getJsonHandler(addAlarmUri, TaskType.ADD_ALARM, alarm.id);
+        } else {
+            launchToast(R.string.lightuppi_add_existing);
+        }
+    }
+
+    private void addServerAlarmCallback(long alarmID, JSONObject jResult) {
+        boolean addSuccess;
+        long lightuppiId;
+        try {
+            addSuccess = jResult.getBoolean("success");
+            lightuppiId = jResult.getLong("id");
+        } catch (Exception  e) {
+            if ((e instanceof JSONException) || (e instanceof NullPointerException)) {
+                Log.w(LOG_TAG + "Exception when reading callback from add operation: " + e);
+                launchToast(R.string.lightuppi_add_unsuccessful);
+                return;
+            } else {
+                throw new RuntimeException(e);
+            }
+        }
+        if (addSuccess) {
+            // We need the alarm back before we can edit the LightUpPi ID
+            ContentResolver cr = mActivityContext.getContentResolver();
+            Alarm addedAlarm = Alarm.getAlarm(cr, alarmID);
+            addedAlarm.lightuppiId = lightuppiId;
+            // Last argument causes the bypass of the Alarm.updateAlarm() automatic timestamp
+            // and the edit of the alarm in the LightUpPi server
+            mAlarmFragment.asyncUpdateAlarm(addedAlarm, false, true);
+            launchToast(R.string.lightuppi_add_successful);
+        } else {
+            launchToast(R.string.lightuppi_add_unsuccessful);
+        }
+    }
+
+    /**
      * Edits an alarm from the LightUpPi server.
      *
      * @param alarm LightUpPi Alarm to edit.
@@ -171,22 +235,22 @@ public class LightUpPiSync {
                     .appendQueryParameter("saturday",
                             Boolean.toString(alarm.daysOfWeek.isSaturdayEnabled()))
                     .appendQueryParameter("sunday",
-                            Boolean.toString(alarm.daysOfWeek.isMondayEnabled()))
+                            Boolean.toString(alarm.daysOfWeek.isSundayEnabled()))
                     .appendQueryParameter("enabled", Boolean.toString(alarm.enabled))
                     .appendQueryParameter("label", alarm.label);
-            getJsonHandler(editAlarmUri, TaskType.EDIT_ALARM);
+            getJsonHandler(editAlarmUri, TaskType.EDIT_ALARM, alarm.id);
         } else {
-            launchToast(R.string.lightuppi_edit_unsuccessful);
+            launchToast(R.string.lightuppi_no_server_ID);
         }
     }
 
     private void editServerAlarmCallback(JSONObject jResult) {
         boolean editSuccess;
-        long lightuppiID;
+        long lightuppiId;
         long newTimestamp;
         try {
             editSuccess = jResult.getBoolean("success");
-            lightuppiID = jResult.getLong("id");
+            lightuppiId = jResult.getLong("id");
             newTimestamp = jResult.getLong("timestamp");
         } catch (Exception  e) {
             if ((e instanceof JSONException) || (e instanceof NullPointerException)) {
@@ -198,12 +262,12 @@ public class LightUpPiSync {
             }
         }
         if (editSuccess) {
-            // We need to alarm back before we can edit the data
+            // We need the alarm back before we can edit the timestamp
             ContentResolver cr = mActivityContext.getContentResolver();
-            Alarm editedAlarm = Alarm.getAlarmLightuppiId(cr, lightuppiID);
+            Alarm editedAlarm = Alarm.getAlarmLightuppiId(cr, lightuppiId);
             editedAlarm.timestamp = newTimestamp;
             // Last argument causes the bypass of the Alarm.updateAlarm() automatic timestamp
-            // and edit of the alarm in the LightUpPi server
+            // and the edit of the alarm in the LightUpPi server
             mAlarmFragment.asyncUpdateAlarm(editedAlarm, false, true);
             launchToast(R.string.lightuppi_edit_successful);
         } else {
@@ -222,9 +286,9 @@ public class LightUpPiSync {
             Uri.Builder deleteAlarmUri= getServerUriBuilder();
             deleteAlarmUri.appendPath("deleteAlarm")
                     .appendQueryParameter("id", Long.toString(alarm.lightuppiId));
-            getJsonHandler(deleteAlarmUri, TaskType.DELETE_ALARM);
+            getJsonHandler(deleteAlarmUri, TaskType.DELETE_ALARM, alarm.id);
         } else {
-            launchToast(R.string.lightuppi_delete_unsuccessful);
+            launchToast(R.string.lightuppi_no_server_ID);
         }
     }
 
@@ -271,15 +335,17 @@ public class LightUpPiSync {
      * Before attempting to fetch the URL, makes sure that there is a network connection.
      *
      * @param uriBuilder The URI Builder of the JSON data address to request.
+     * @param taskType Indicates which task it is to be performed.
+     * @param alarmId If applicable, the Alarm ID (local, not LightUpPi Id) to perform the task.
      */
-    private void getJsonHandler(Uri.Builder uriBuilder, TaskType taskType) {
-        // We need the context manager and
+    private void getJsonHandler(Uri.Builder uriBuilder, TaskType taskType, long alarmId) {
+        // First check if there is network connectivity
         ConnectivityManager connMgr = (ConnectivityManager)
                 mActivityContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
             String urlString = uriBuilder.build().toString();
-            new DownloadJsonTask(taskType).execute(urlString);
+            new DownloadJsonTask(taskType, alarmId).execute(urlString);
         } else {
             launchToast(R.string.lightuppi_no_connection);
         }
@@ -295,14 +361,16 @@ public class LightUpPiSync {
     private class DownloadJsonTask extends AsyncTask<String, Void, JSONObject> {
         private ProgressDialog progress;
         private TaskType mTaskType;
+        private long mAlarmId;
 
         /**
          * Constructor requires a TaskType argument to identify the correct callback.
          *
          * @param taskType The type of task required in order to identify the right callback.
          */
-        DownloadJsonTask(TaskType taskType) {
-            mTaskType = taskType;
+        DownloadJsonTask(TaskType taskType, long alarmId) {
+            this.mTaskType = taskType;
+            this.mAlarmId = alarmId;
         }
 
         /**
@@ -361,6 +429,7 @@ public class LightUpPiSync {
                 case GET_ALARM:
                     break;
                 case ADD_ALARM:
+                    addServerAlarmCallback(mAlarmId, result);
                     break;
                 case EDIT_ALARM:
                     editServerAlarmCallback(result);
@@ -398,9 +467,13 @@ public class LightUpPiSync {
                 // Starts the query
                 conn.connect();
                 int response = conn.getResponseCode();
-                if (Log.LOGV) Log.i(LOG_TAG + "query \"" + urlStr + "\" response is " + response);
-                // TODO: Check the response, if not 200 we want to inform the user the server was
-                //       reached but the data was not as expected, probably not running LightUpPi
+                if (response == 500) {
+                    launchToast(R.string.lightuppi_response_500);
+                } else if (response != 200) {
+                    launchToast(String.format(
+                            mActivityContext.getString(R.string.lightuppi_response_not_200),
+                            response));
+                }
 
                 // Get and convert the InputStream into a string
                 is = conn.getInputStream();
@@ -514,7 +587,7 @@ public class LightUpPiSync {
                         conn.connect();
                         response = conn.getResponseCode();
                     } catch (Exception e) {
-                        // Ignored as a non-200 value for response will trigger the offline title
+                        // Safely ignored as a response!=200 will trigger the offline title
                     }
                     if (response == 200) {
                         if (Log.LOGV) Log.i(LOG_TAG + "Server response 200");
@@ -547,6 +620,14 @@ public class LightUpPiSync {
         ((Activity)mActivityContext).runOnUiThread(new Runnable() {
             public void run() {
                 Toast.makeText(mActivityContext, resourceId, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void launchToast(final String toastText) {
+        ((Activity)mActivityContext).runOnUiThread(new Runnable() {
+            public void run() {
+                Toast.makeText(mActivityContext, toastText, Toast.LENGTH_LONG).show();
             }
         });
     }

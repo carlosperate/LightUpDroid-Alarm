@@ -20,14 +20,10 @@
 
 package com.embeddedlog.LightUpDroid;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 public class Log {
     public final static String LOGTAG = "LightUpDroid";
 
-    /** This must be false for production.  If true, turns on logging,
-     test code, etc. */
+    /** This must be false for production.  If true, turns on verbose logging, extra info, etc. */
     public static final boolean LOGV = true;
 
     public static void d(String logMe) {
@@ -35,7 +31,7 @@ public class Log {
     }
 
     public static void v(String logMe) {
-        android.util.Log.v(LOGTAG, /* SystemClock.uptimeMillis() + " " + */ logMe);
+        android.util.Log.v(LOGTAG, logMe);
     }
 
     public static void i(String logMe) {
@@ -58,7 +54,4 @@ public class Log {
         android.util.Log.wtf(LOGTAG, logMe);
     }
 
-    public static String formatTime(long millis) {
-        return new SimpleDateFormat("HH:mm:ss.SSS/E").format(new Date(millis));
-    }
 }

@@ -834,10 +834,14 @@
     <string name="lightuppi_syncing_message">Syncing with LightUpPi server</string>
     <string name="lightuppi_sync_fail">LightUpPi Sync failed</string>
     <string name="lightuppi_no_connection">Sync failed, no network connection</string>
+    <string name="lightuppi_response_500">LightUpPi Internal Server Error</string>
+    <string name="lightuppi_response_not_200">Error: LightUpPi server response %1$d</string>
     <string name="lightuppi_add_successful">LightUpPi Alarm successfully added</string>
     <string name="lightuppi_add_unsuccessful">LightUpPi Alarm edit UNSUCCESSFUL</string>
+    <string name="lightuppi_add_existing">New alarm already registered in LightUpPi</string>
     <string name="lightuppi_edit_successful">LightUpPi Alarm successfully edited</string>
     <string name="lightuppi_edit_unsuccessful">LightUpPi Alarm edit UNSUCCESSFUL</string>
+    <string name="lightuppi_no_server_ID">Alarm does not have a LightUpPi ID</string>
     <string name="lightuppi_delete_successful">LightUpPi Alarm successfully deleted</string>
     <string name="lightuppi_delete_unsuccessful">LightUpPi Alarm delete UNSUCCESSFUL</string>
 </resources>
