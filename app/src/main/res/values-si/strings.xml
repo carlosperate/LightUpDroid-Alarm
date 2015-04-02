@@ -82,11 +82,11 @@
     <string name="auto_silence_summary" msgid="7028508740659733028">"මිනිත්තු <xliff:g id="MINUTES">%d</xliff:g>"</string>
     <string name="auto_silence_never" msgid="4821982647348750809">"කවදාවත් නොවේ"</string>
   <string-array name="auto_silence_entries">
-    <item msgid="3693401222993867634">"මිනිත්තු 5"</item>
-    <item msgid="3663730603519549990">"මිනිත්තු 10"</item>
-    <item msgid="1385481095199681200">"මිනිත්තු 15"</item>
-    <item msgid="420479821767342125">"මිනිත්තු 20"</item>
-    <item msgid="2107936130151066746">"මිනිත්තු 25"</item>
+    <item msgid="3693401222993867634">"මිනිත්තු 1"</item>
+    <item msgid="3663730603519549990">"මිනිත්තු 3"</item>
+    <item msgid="1385481095199681200">"මිනිත්තු 5"</item>
+    <item msgid="420479821767342125">"මිනිත්තු 10"</item>
+    <item msgid="2107936130151066746">"මිනිත්තු 15"</item>
     <item msgid="7219791437023378544">"මිනිත්තු 30"</item>
     <item msgid="4278641338024561333">"කවදාවත් නොවේ"</item>
   </string-array>
