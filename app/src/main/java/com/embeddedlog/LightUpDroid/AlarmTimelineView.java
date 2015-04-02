@@ -223,7 +223,7 @@ public class AlarmTimelineView extends View {
                 2 * res.getDimensionPixelOffset(R.dimen.footer_button_layout_margin);
         mAlarmNodeRadius = res.getDimensionPixelOffset(R.dimen.alarm_timeline_radius);
         mAlarmNodeInnerRadius = res.getDimensionPixelOffset(R.dimen.alarm_timeline_inner_radius);
-        mAlarmNodeInnerRadiusColor = res.getColor(R.color.blackish);
+        mAlarmNodeInnerRadiusColor = res.getColor(R.color.primary);
         mAlarmTextSize = res.getDimensionPixelOffset(R.dimen.alarm_text_font_size);
         mAlarmTextPadding = res.getDimensionPixelOffset(R.dimen.alarm_text_padding);
         mAlarmMinDistance = res.getDimensionPixelOffset(R.dimen.alarm_min_distance) +

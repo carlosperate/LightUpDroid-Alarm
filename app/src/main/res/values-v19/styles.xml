@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2015 carlosperate carlosperate.github.io
+<!-- Copyright (C) 2015 carlosperate http://carlosperate.github.io
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -16,15 +16,9 @@
 
 <resources>
 
-    <!-- Status Bar Translucent style >
-    <style name="AlarmClockTheme" parent="android:Theme.Holo">
-        <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:windowTranslucentNavigation">true</item>
-    </style-->
-
     <style name="DeskClock" parent="android:Theme.Holo">
         <item name="android:windowActionBarOverlay">false</item>
-        <item name="android:windowBackground">@color/blue_grey_800</item>
+        <item name="android:windowBackground">@color/primary_dark</item>
         <item name="android:actionBarTabStyle">@style/DeskClockTabStyle</item>
         <item name="android:actionBarStyle">@style/DeskClockBarStyle</item>
         <item name="android:actionBarTabBarStyle">@style/DeskClockTabBarStyle</item>
@@ -36,9 +30,8 @@
         <item name="android:fitsSystemWindows">false</item>
     </style>
 
-
     <style name="SettingsTheme" parent="android:Theme.Holo">
-        <item name="android:windowBackground">@color/blue_grey_900</item>
+        <item name="android:windowBackground">@color/settings_background</item>
         <item name="android:actionBarStyle">@style/SettingsTheme.ActionBar</item>
         <item name="android:dropDownListViewStyle">@style/DeskClockDropDownListView</item>
         <item name="android:selectableItemBackground">@drawable/item_background</item>

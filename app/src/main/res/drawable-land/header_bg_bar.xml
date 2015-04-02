@@ -18,6 +18,6 @@
     android:shape="rectangle">
     <gradient
         android:angle="270"
-        android:startColor="@color/blue_grey_800"
-        android:endColor="@color/blue_grey_800_trans" />
+        android:startColor="@color/primary_dark"
+        android:endColor="@color/primary_dark_trans" />
 </shape>

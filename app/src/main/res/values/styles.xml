@@ -23,13 +23,12 @@
 
     <style name="DeskClock" parent="android:Theme.Holo">
         <item name="android:windowActionBarOverlay">false</item>
-        <item name="android:windowBackground">@color/blue_grey_800</item>
+        <item name="android:windowBackground">@color/primary_dark</item>
         <item name="android:actionBarTabStyle">@style/DeskClockTabStyle</item>
         <item name="android:actionBarStyle">@style/DeskClockBarStyle</item>
         <item name="android:actionBarTabBarStyle">@style/DeskClockTabBarStyle</item>
         <item name="android:dropDownListViewStyle">@style/DeskClockDropDownListView</item>
         <item name="android:selectableItemBackground">@drawable/item_background</item>
-        <!--item name="android:fitsSystemWindows">true</item-->
     </style>
     <style name="DeskClockTabStyle" parent="@android:style/Theme.Holo">
         <item name="android:paddingLeft">@dimen/actionbar_tab_padding</item>
@@ -45,9 +44,9 @@
         <item name="android:gravity">center</item>
     </style>
     <style name="DeskClockBarStyle" parent="@android:style/Widget.Holo.ActionBar">
-        <item name="android:background">@color/blue_grey_800</item>
-        <item name="android:backgroundStacked">@color/blue_grey_800</item>
-        <item name="android:backgroundSplit">@color/blue_grey_800</item>
+        <item name="android:background">@color/primary_dark</item>
+        <item name="android:backgroundStacked">@color/primary_dark</item>
+        <item name="android:backgroundSplit">@color/primary_dark</item>
         <item name="android:displayOptions">showTitle</item>
     </style>
 
@@ -56,14 +55,14 @@
     </style>
 
     <style name="AlarmClockTheme" parent="@android:style/Theme.Holo">
-        <item name="android:windowBackground">@color/blue_grey_700</item>
+        <item name="android:windowBackground">@color/primary</item>
         <item name="android:actionBarStyle">@style/SettingsTheme.ActionBar</item>
         <item name="android:dropDownListViewStyle">@style/DeskClockDropDownListView</item>
         <item name="android:selectableItemBackground">@drawable/item_background</item>
     </style>
 
     <style name="SettingsTheme" parent="android:Theme.Holo">
-        <item name="android:windowBackground">@color/blue_grey_900</item>
+        <item name="android:windowBackground">@color/settings_background</item>
         <item name="android:actionBarStyle">@style/SettingsTheme.ActionBar</item>
         <item name="android:dropDownListViewStyle">@style/DeskClockDropDownListView</item>
         <item name="android:selectableItemBackground">@drawable/item_background</item>

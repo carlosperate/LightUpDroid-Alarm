@@ -303,7 +303,6 @@ public class AlarmClockFragment extends DeskClockFragment implements
 
                 // If there are no alarms in the adapter...
                 if (count == 0) {
-                    // TODO: change this to the new color scheme
                     mAddAlarmButton.setBackgroundResource(R.drawable.main_button_red);
 
                     // ...and if there exists a timeline view (currently only in tablet landscape)

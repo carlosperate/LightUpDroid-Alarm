@@ -15,7 +15,6 @@ dependencies {
 android {
     compileSdkVersion 17
     buildToolsVersion "19.1.0"
-
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -39,8 +38,12 @@ android {
         debug.setRoot('build-types/debug')
         release.setRoot('build-types/release')
     }
-
     lintOptions {
         abortOnError false
+    }
+    defaultConfig {
+        minSdkVersion 16
+    }
+    productFlavors {
     }
 }
