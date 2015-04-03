@@ -67,7 +67,6 @@ import android.widget.ToggleButton;
 import com.android.datetimepicker.time.RadialPickerLayout;
 import com.android.datetimepicker.time.TimePickerDialog;
 import com.embeddedlog.LightUpDroid.alarms.AlarmStateManager;
-import com.embeddedlog.LightUpDroid.alarms.LightUpPiSync;
 import com.embeddedlog.LightUpDroid.provider.Alarm;
 import com.embeddedlog.LightUpDroid.provider.AlarmInstance;
 import com.embeddedlog.LightUpDroid.provider.DaysOfWeek;
@@ -1718,13 +1717,8 @@ public class AlarmClockFragment extends DeskClockFragment implements
         return newInstance;
     }
 
-    protected static void getAllAlarms(Context context) {
-        ContentResolver cr = context.getContentResolver();
-        // Passing null as selection argument retrieves all alarms
-        List<Alarm> alarmList = Alarm.getAlarms(cr, null);
-    }
-
-    public void asyncDeleteAlarm(final Alarm alarm, final View viewToRemove) {
+    protected void asyncDeleteAlarm(
+            final Alarm alarm, final View viewToRemove, final boolean... bypassServer) {
         final Context context = AlarmClockFragment.this.getActivity().getApplicationContext();
         final AsyncTask<Void, Void, Void> deleteTask = new AsyncTask<Void, Void, Void>() {
             @Override
@@ -1757,7 +1751,10 @@ public class AlarmClockFragment extends DeskClockFragment implements
                     ContentResolver cr = context.getContentResolver();
                     AlarmStateManager.deleteAllInstances(context, alarm.id);
                     Alarm.deleteAlarm(cr, alarm.id);
-                    newLightUpPiSync().deleteServerAlarm(alarm);
+                    if ((bypassServer.length <= 0) || (!bypassServer[0]) ) {
+                        newLightUpPiSync().deleteServerAlarm(alarm);
+                    }
+
                 }
                 return null;
             }
@@ -1766,7 +1763,7 @@ public class AlarmClockFragment extends DeskClockFragment implements
         deleteTask.execute();
     }
 
-    public void asyncAddAlarm(final Alarm alarm) {
+    protected void asyncAddAlarm(final Alarm alarm, final boolean... bypassServer) {
         final Context context = AlarmClockFragment.this.getActivity().getApplicationContext();
         final AsyncTask<Void, Void, AlarmInstance> updateTask =
                 new AsyncTask<Void, Void, AlarmInstance>() {
@@ -1795,7 +1792,10 @@ public class AlarmClockFragment extends DeskClockFragment implements
 
                     // Add alarm to db
                     Alarm newAlarm = Alarm.addAlarm(cr, alarm);
-                    newLightUpPiSync().addServerAlarm(alarm);
+                    // Add alarm to server unless bypass requested.
+                    if ((bypassServer.length <= 0) || (!bypassServer[0]) ) {
+                        newLightUpPiSync().addServerAlarm(alarm);
+                    }
                     mScrollToAlarmId = newAlarm.id;
 
                     // Create and add instance to db
@@ -1816,8 +1816,8 @@ public class AlarmClockFragment extends DeskClockFragment implements
         updateTask.execute();
     }
 
-    public void asyncUpdateAlarm(
-            final Alarm alarm, final boolean popToast, final boolean... bypassTimestamp) {
+    protected void asyncUpdateAlarm(
+            final Alarm alarm, final boolean popToast, final boolean... bypassServer) {
         final Context context = AlarmClockFragment.this.getActivity().getApplicationContext();
         final AsyncTask<Void, Void, AlarmInstance> updateTask =
                 new AsyncTask<Void, Void, AlarmInstance>() {
@@ -1828,9 +1828,9 @@ public class AlarmClockFragment extends DeskClockFragment implements
                 // Dismiss all old instances
                 AlarmStateManager.deleteAllInstances(context, alarm.id);
 
-                // Update alarm, if bypassing the timestamp this is a request from LightUpPi server,
-                // so only need to update it when bypass is not requested
-                if (bypassTimestamp.length > 0 && bypassTimestamp[0]) {
+                // Update alarm, if bypassing the server we also want to bypass the timestamp (3rd
+                // argument in updateAlarm. Usually this is a request from LightUpPi server.
+                if (bypassServer.length > 0 && bypassServer[0]) {
                     Alarm.updateAlarm(cr, alarm, true);
                 } else {
                     Alarm.updateAlarm(cr, alarm);

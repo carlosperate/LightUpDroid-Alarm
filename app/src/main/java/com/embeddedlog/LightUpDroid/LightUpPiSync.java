@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.embeddedlog.LightUpDroid.alarms;
+package com.embeddedlog.LightUpDroid;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -29,10 +29,6 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
-import com.embeddedlog.LightUpDroid.AlarmClockFragment;
-import com.embeddedlog.LightUpDroid.Log;
-import com.embeddedlog.LightUpDroid.R;
-import com.embeddedlog.LightUpDroid.SettingsActivity;
 import com.embeddedlog.LightUpDroid.provider.Alarm;
 
 import org.json.JSONArray;
@@ -136,12 +132,13 @@ public class LightUpPiSync {
                         break toNextLocalAlarmIteration;
                     }
                 }
-                mAlarmFragment.asyncDeleteAlarm(localAlarm, null);
+                // This is only executed if a match between server and local alarm was not found
+                mAlarmFragment.asyncDeleteAlarm(localAlarm, null, true);
             }
         }
-        // The rest of the serverAlarms are new to the phone
+        // The rest of the serverAlarms are new to the phone and present in the server
         for (Alarm serverAlarm : serverAlarms) {
-            mAlarmFragment.asyncAddAlarm(serverAlarm);
+            mAlarmFragment.asyncAddAlarm(serverAlarm, true);
         }
     }
 
@@ -459,8 +456,8 @@ public class LightUpPiSync {
             try {
                 URL url = new URL(urlStr);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setReadTimeout(10000);    /* milliseconds */
-                conn.setConnectTimeout(15000); /* milliseconds */
+                conn.setReadTimeout(3000);    /* milliseconds */
+                conn.setConnectTimeout(5000); /* milliseconds */
                 conn.setRequestMethod("GET");
                 conn.setDoInput(true);
 
@@ -580,8 +577,8 @@ public class LightUpPiSync {
                     try {
                         URL url = new URL(pingUri.build().toString());
                         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                        conn.setReadTimeout(10000);    /* milliseconds */
-                        conn.setConnectTimeout(15000); /* milliseconds */
+                        conn.setReadTimeout(3000);    /* milliseconds */
+                        conn.setConnectTimeout(5000); /* milliseconds */
                         conn.setRequestMethod("GET");
                         conn.setDoInput(true);
                         conn.connect();

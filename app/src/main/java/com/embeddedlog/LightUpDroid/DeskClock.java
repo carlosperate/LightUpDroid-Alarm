@@ -48,7 +48,6 @@ import android.view.View.OnTouchListener;
 import android.widget.TextView;
 
 import com.embeddedlog.LightUpDroid.alarms.AlarmStateManager;
-import com.embeddedlog.LightUpDroid.alarms.LightUpPiSync;
 import com.embeddedlog.LightUpDroid.provider.Alarm;
 import com.embeddedlog.LightUpDroid.provider.ClockContract;
 import com.embeddedlog.LightUpDroid.stopwatch.StopwatchService;
