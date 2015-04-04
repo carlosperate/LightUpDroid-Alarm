@@ -76,7 +76,6 @@ import com.embeddedlog.LightUpDroid.widget.TextTime;
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
 import java.util.HashSet;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -499,6 +498,7 @@ public class AlarmClockFragment extends DeskClockFragment implements
     }
 
     private void showUndoBar() {
+        final Alarm deletedAlarm = mDeletedAlarm;
         mUndoFrame.setVisibility(View.VISIBLE);
         mUndoBar.show(new ActionableToastBar.ActionClickedListener() {
             @Override
@@ -506,6 +506,8 @@ public class AlarmClockFragment extends DeskClockFragment implements
                 asyncAddAlarm(mDeletedAlarm);
                 mDeletedAlarm = null;
                 mUndoShowing = false;
+
+                asyncAddAlarm(deletedAlarm);
             }
         }, 0, getResources().getString(R.string.alarm_deleted), true, R.string.alarm_undo, true);
     }
@@ -592,9 +594,9 @@ public class AlarmClockFragment extends DeskClockFragment implements
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, final Cursor data) {
         mAdapter.swapCursor(data);
-        if (mScrollToAlarmId != -1) {
+        if (mScrollToAlarmId != Alarm.INVALID_ID) {
             scrollToAlarm(mScrollToAlarmId);
-            mScrollToAlarmId = -1;
+            mScrollToAlarmId = Alarm.INVALID_ID;
         }
     }
 
@@ -733,17 +735,17 @@ public class AlarmClockFragment extends DeskClockFragment implements
         }
 
         // Used for scrolling an expanded item in the list to make sure it is fully visible.
-        private long mScrollAlarmId = -1;
+        private long mScrollAlarmId = Alarm.INVALID_ID;
         private final Runnable mScrollRunnable = new Runnable() {
             @Override
             public void run() {
-                if (mScrollAlarmId != -1) {
+                if (mScrollAlarmId != Alarm.INVALID_ID) {
                     View v = getViewById(mScrollAlarmId);
                     if (v != null) {
                         Rect rect = new Rect(v.getLeft(), v.getTop(), v.getRight(), v.getBottom());
                         mList.requestChildRectangleOnScreen(v, rect, false);
                     }
-                    mScrollAlarmId = -1;
+                    mScrollAlarmId = Alarm.INVALID_ID;
                 }
             }
         };
@@ -1110,7 +1112,6 @@ public class AlarmClockFragment extends DeskClockFragment implements
                 itemHolder.daysOfWeek.setContentDescription(alarm.daysOfWeek.toAccessibilityString(
                         AlarmClockFragment.this.getActivity()));
                 itemHolder.daysOfWeek.setVisibility(View.VISIBLE);
-                labelSpace = "  ";
                 itemHolder.daysOfWeek.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -1124,7 +1125,7 @@ public class AlarmClockFragment extends DeskClockFragment implements
             }
 
             if (alarm.label != null && alarm.label.length() != 0) {
-                itemHolder.label.setText(alarm.label + labelSpace);
+                itemHolder.label.setText(alarm.label + "  ");
                 itemHolder.label.setVisibility(View.VISIBLE);
                 itemHolder.label.setContentDescription(
                         mContext.getResources().getString(R.string.label_description) + " "
@@ -1218,6 +1219,7 @@ public class AlarmClockFragment extends DeskClockFragment implements
                         }
                         updateDaysOfWeekButtons(itemHolder, alarm.daysOfWeek);
                     } else {
+                        // Hide days
                         itemHolder.repeatDays.setVisibility(View.GONE);
                         mRepeatChecked.remove(alarm.id);
 
@@ -1228,6 +1230,7 @@ public class AlarmClockFragment extends DeskClockFragment implements
                         // Remove all repeat days
                         alarm.daysOfWeek.clearAllDays();
                     }
+
                     asyncUpdateAlarm(alarm, false);
                 }
             });

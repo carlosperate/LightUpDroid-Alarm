@@ -48,7 +48,7 @@ public class WorldClockAdapter extends BaseAdapter {
     private String mClockStyle;
     private final Collator mCollator = Collator.getInstance();
     protected HashMap<String, CityObj> mCitiesDb = new HashMap<String, CityObj>();
-    private int mClocksPerRow;
+    protected int mClocksPerRow;
 
     public WorldClockAdapter(Context context) {
         super();
@@ -86,7 +86,7 @@ public class WorldClockAdapter extends BaseAdapter {
         }
     }
 
-    /***
+    /**
      * Adds the home city as the first item of the adapter if the feature is on and the device time
      * zone is different from the home time zone that was set by the user.
      * return the list of cities.

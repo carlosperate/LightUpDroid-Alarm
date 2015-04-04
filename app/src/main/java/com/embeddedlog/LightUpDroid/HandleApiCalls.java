@@ -75,7 +75,7 @@ public class HandleApiCalls extends Activity {
         }
     }
 
-    /***
+    /**
      * Processes the SET_ALARM intent
      * @param intent
      */

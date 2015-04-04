@@ -65,7 +65,8 @@ public final class AlarmNotifications {
                 .setSmallIcon(R.drawable.stat_notify_alarm)
                 .setOngoing(false)
                 .setAutoCancel(false)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setCategory(NotificationCompat.CATEGORY_ALARM);
 
         // Setup up hide notification
         Intent hideIntent = AlarmStateManager.createStateChangeIntent(context, "DELETE_TAG",
@@ -106,7 +107,8 @@ public final class AlarmNotifications {
                 .setSmallIcon(R.drawable.stat_notify_alarm)
                 .setOngoing(true)
                 .setAutoCancel(false)
-                .setPriority(NotificationCompat.PRIORITY_HIGH);
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_ALARM);
 
         // Setup up dismiss action
         Intent dismissIntent = AlarmStateManager.createStateChangeIntent(context, "DISMISS_TAG",
@@ -142,7 +144,8 @@ public final class AlarmNotifications {
                 .setSmallIcon(R.drawable.stat_notify_alarm)
                 .setOngoing(true)
                 .setAutoCancel(false)
-                .setPriority(NotificationCompat.PRIORITY_MAX);
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setCategory(NotificationCompat.CATEGORY_ALARM);
 
         // Setup up dismiss action
         Intent dismissIntent = AlarmStateManager.createStateChangeIntent(context, "DISMISS_TAG",
@@ -177,7 +180,8 @@ public final class AlarmNotifications {
                 .setContentTitle(context.getString(R.string.alarm_missed_title))
                 .setContentText(contextText)
                 .setSmallIcon(R.drawable.stat_notify_alarm)
-                .setPriority(NotificationCompat.PRIORITY_HIGH);
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_ALARM);
 
         // Setup dismiss intent
         Intent dismissIntent = AlarmStateManager.createStateChangeIntent(context, "DISMISS_TAG",
@@ -211,7 +215,9 @@ public final class AlarmNotifications {
                 .setSmallIcon(R.drawable.stat_notify_alarm)
                 .setOngoing(true)
                 .setAutoCancel(false)
-                .setWhen(0);
+                .setDefaults(NotificationCompat.DEFAULT_LIGHTS)
+                .setWhen(0)
+                .setCategory(NotificationCompat.CATEGORY_ALARM);
 
         // Setup Snooze Action
         Intent snoozeIntent = AlarmStateManager.createStateChangeIntent(context, "SNOOZE_TAG",
@@ -257,5 +263,14 @@ public final class AlarmNotifications {
         NotificationManager nm = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
         nm.cancel(instance.hashCode());
+    }
+
+    private static Intent createViewAlarmIntent(Context context, AlarmInstance instance) {
+        long alarmId = instance.mAlarmId == null ? Alarm.INVALID_ID : instance.mAlarmId;
+        Intent viewAlarmIntent = Alarm.createIntent(context, DeskClock.class, alarmId);
+        viewAlarmIntent.putExtra(DeskClock.SELECT_TAB_INTENT_EXTRA, DeskClock.ALARM_TAB_INDEX);
+        viewAlarmIntent.putExtra(AlarmClockFragment.SCROLL_TO_ALARM_INTENT_EXTRA, alarmId);
+        viewAlarmIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        return viewAlarmIntent;
     }
 }

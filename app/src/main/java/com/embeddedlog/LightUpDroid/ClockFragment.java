@@ -156,8 +156,8 @@ public class ClockFragment extends DeskClockFragment implements OnSharedPreferen
                         mLastTouchY = event.getY();
                         return true;
                     case (MotionEvent.ACTION_MOVE):
-                        float xDiff = Math.abs(event.getX()-mLastTouchX);
-                        float yDiff = Math.abs(event.getY()-mLastTouchY);
+                        float xDiff = Math.abs(event.getX() - mLastTouchX);
+                        float yDiff = Math.abs(event.getY() - mLastTouchY);
                         if (xDiff >= mMaxMovementAllowed || yDiff >= mMaxMovementAllowed) {
                             mHandler.removeCallbacksAndMessages(null);
                         }

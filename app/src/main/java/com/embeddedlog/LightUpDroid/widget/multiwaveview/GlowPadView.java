@@ -79,7 +79,7 @@ public class GlowPadView extends View {
     }
 
     // Tuneable parameters for animation
-    private static final int WAVE_ANIMATION_DURATION = 1350;
+    private static final int WAVE_ANIMATION_DURATION = 1000;
     private static final int RETURN_TO_HOME_DELAY = 1200;
     private static final int RETURN_TO_HOME_DURATION = 200;
     private static final int HIDE_ANIMATION_DELAY = 200;
@@ -231,6 +231,10 @@ public class GlowPadView extends View {
         Drawable pointDrawable = pointId != 0 ? res.getDrawable(pointId) : null;
         mGlowRadius = a.getDimension(R.styleable.GlowPadView_glowRadius, 0.0f);
 
+        mPointCloud = new PointCloud(pointDrawable);
+        mPointCloud.makePointCloud(mInnerRadius, mOuterRadius);
+        mPointCloud.glowManager.setRadius(mGlowRadius);
+
         TypedValue outValue = new TypedValue();
 
         // Read array of target drawables
@@ -259,21 +263,14 @@ public class GlowPadView extends View {
             setDirectionDescriptionsResourceId(resourceId);
         }
 
-        a.recycle();
-
         // Use gravity attribute from LinearLayout
         //a = context.obtainStyledAttributes(attrs, R.styleable.LinearLayout);
         mGravity = a.getInt(R.styleable.GlowPadView_android_gravity, Gravity.TOP);
         a.recycle();
 
-
         setVibrateEnabled(mVibrationDuration > 0);
 
         assignDefaultsIfNeeded();
-
-        mPointCloud = new PointCloud(pointDrawable);
-        mPointCloud.makePointCloud(mInnerRadius, mOuterRadius);
-        mPointCloud.glowManager.setRadius(mGlowRadius);
     }
 
     private int getResourceId(TypedArray a, int id) {
@@ -841,7 +838,7 @@ public class GlowPadView extends View {
             float eventX = k < historySize ? event.getHistoricalX(actionIndex, k)
                     : event.getX(actionIndex);
             float eventY = k < historySize ? event.getHistoricalY(actionIndex, k)
-                    :event.getY(actionIndex);
+                    : event.getY(actionIndex);
             // tx and ty are relative to wave center
             float tx = eventX - mWaveCenterX;
             float ty = eventY - mWaveCenterY;

@@ -361,7 +361,6 @@ public class DeskClock extends Activity implements LabelDialogFragment.TimerLabe
     }
 
     private boolean processMenuClick(MenuItem item) {
-
         switch (item.getItemId()) {
             case R.id.menu_item_settings:
                 startActivity(new Intent(DeskClock.this, SettingsActivity.class));
@@ -480,10 +479,24 @@ public class DeskClock extends Activity implements LabelDialogFragment.TimerLabe
 
         @Override
         public Fragment getItem(int position) {
-            TabInfo info = mTabs.get(getRtlPosition(position));
-            DeskClockFragment f = (DeskClockFragment) Fragment.instantiate(
-                    mContext, info.clss.getName(), info.args);
-            return f;
+            // Because this public method is called outside many times,
+            // check if it exits first before creating a new one.
+            final String name = makeFragmentName(R.id.desk_clock_pager, position);
+            Fragment fragment = getFragmentManager().findFragmentByTag(name);
+            if (fragment == null) {
+                TabInfo info = mTabs.get(getRtlPosition(position));
+                fragment = Fragment.instantiate(mContext, info.clss.getName(), info.args);
+            }
+            return fragment;
+        }
+
+        /**
+         * Copied from:
+         * android/frameworks/support/v13/java/android/support/v13/app/FragmentPagerAdapter.java#94
+         * Create unique name for the fragment so fragment manager knows it exist.
+         */
+        private String makeFragmentName(int viewId, int index) {
+            return "android:switcher:" + viewId + ":" + index;
         }
 
         @Override
@@ -630,8 +643,8 @@ public class DeskClock extends Activity implements LabelDialogFragment.TimerLabe
                     }
                     break;
                 case (MotionEvent.ACTION_UP):
-                    float xDiff = Math.abs(e.getX()-mLastTouchX);
-                    float yDiff = Math.abs(e.getY()-mLastTouchY);
+                    float xDiff = Math.abs(e.getX() - mLastTouchX);
+                    float yDiff = Math.abs(e.getY() - mLastTouchY);
                     long timeDiff = (Utils.getTimeNow() - mLastTouchTime);
                     if (xDiff < MAX_MOVEMENT_ALLOWED && yDiff < MAX_MOVEMENT_ALLOWED
                             && timeDiff < MAX_TIME_ALLOWED) {
@@ -645,8 +658,8 @@ public class DeskClock extends Activity implements LabelDialogFragment.TimerLabe
                     resetValues();
                     break;
                 case (MotionEvent.ACTION_MOVE):
-                    xDiff = Math.abs(e.getX()-mLastTouchX);
-                    yDiff = Math.abs(e.getY()-mLastTouchY);
+                    xDiff = Math.abs(e.getX() - mLastTouchX);
+                    yDiff = Math.abs(e.getY() - mLastTouchY);
                     if (xDiff >= MAX_MOVEMENT_ALLOWED || yDiff >= MAX_MOVEMENT_ALLOWED) {
                         resetValues();
                     }
@@ -658,9 +671,9 @@ public class DeskClock extends Activity implements LabelDialogFragment.TimerLabe
         }
 
         private void resetValues() {
-            mLastTouchX = -1*MAX_MOVEMENT_ALLOWED + 1;
-            mLastTouchY = -1*MAX_MOVEMENT_ALLOWED + 1;
-            mLastTouchTime = -1*MAX_TIME_ALLOWED + 1;
+            mLastTouchX = -1 * MAX_MOVEMENT_ALLOWED + 1;
+            mLastTouchY = -1 * MAX_MOVEMENT_ALLOWED + 1;
+            mLastTouchTime = -1 * MAX_TIME_ALLOWED + 1;
             if (mMakePressedTextView != null) {
                 mMakePressedTextView.setTextColor(mGrayColor);
             }
@@ -686,4 +699,9 @@ public class DeskClock extends Activity implements LabelDialogFragment.TimerLabe
             ((AlarmClockFragment) frag).setLabel(alarm, label);
         }
     }
+
+    public int getSelectedTab() {
+        return mSelectedTab;
+    }
+
 }

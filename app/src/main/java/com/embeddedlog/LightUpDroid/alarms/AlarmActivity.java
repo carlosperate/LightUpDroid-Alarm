@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 The Android Open Source Project
+ * Copyright (C) 2014 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
@@ -46,13 +45,19 @@ import com.embeddedlog.LightUpDroid.widget.multiwaveview.GlowPadView;
  * Alarm activity that pops up a visible indicator when the alarm goes off.
  */
 public class AlarmActivity extends Activity {
-    // AlarmActivity listens for this broadcast intent, so that other applications
-    // can snooze the alarm (after ALARM_ALERT_ACTION and before ALARM_DONE_ACTION).
-    public static final String ALARM_SNOOZE_ACTION = "com.android.deskclock.ALARM_SNOOZE";
 
-    // AlarmActivity listens for this broadcast intent, so that other applications
-    // can dismiss the alarm (after ALARM_ALERT_ACTION and before ALARM_DONE_ACTION).
+    /**
+     * AlarmActivity listens for this broadcast intent, so that other applications can snooze the
+     * alarm (after ALARM_ALERT_ACTION and before ALARM_DONE_ACTION).
+     */
+    public static final String ALARM_SNOOZE_ACTION = "com.android.deskclock.ALARM_SNOOZE";
+    /**
+     * AlarmActivity listens for this broadcast intent, so that other applications can dismiss
+     * the alarm (after ALARM_ALERT_ACTION and before ALARM_DONE_ACTION).
+     */
     public static final String ALARM_DISMISS_ACTION = "com.android.deskclock.ALARM_DISMISS";
+
+    private static final String LOGTAG = AlarmActivity.class.getSimpleName();
 
     // Controller for GlowPadView.
     private class GlowPadController extends Handler implements GlowPadView.OnTriggerListener {
@@ -109,14 +114,16 @@ public class AlarmActivity extends Activity {
         }
     }
 
-    private AlarmInstance mInstance;
+    private AlarmInstance mAlarmInstance;
     private int mVolumeBehavior;
     private GlowPadView mGlowPadView;
     private GlowPadController glowPadController = new GlowPadController();
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
+            final String action = intent.getAction();
+            Log.v(LOGTAG + "Received broadcast: " + action);
+
             if (action.equals(ALARM_SNOOZE_ACTION)) {
                 snooze();
             } else if (action.equals(ALARM_DISMISS_ACTION)) {
@@ -124,30 +131,30 @@ public class AlarmActivity extends Activity {
             } else if (action.equals(AlarmService.ALARM_DONE_ACTION)) {
                 finish();
             } else {
-                Log.i("Unknown broadcast in AlarmActivity: " + action);
+                Log.i(LOGTAG + "Unknown broadcast in AlarmActivity: " + action);
             }
         }
     };
 
     private void snooze() {
-        AlarmStateManager.setSnoozeState(this, mInstance);
+        AlarmStateManager.setSnoozeState(this, mAlarmInstance);
     }
 
     private void dismiss() {
-        AlarmStateManager.setDismissState(this, mInstance);
+        AlarmStateManager.setDismissState(this, mAlarmInstance);
     }
 
     @Override
-    protected void onCreate(Bundle icicle) {
-        super.onCreate(icicle);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-        long instanceId = AlarmInstance.getId(getIntent().getData());
-        mInstance = AlarmInstance.getInstance(this.getContentResolver(), instanceId);
-        if (mInstance != null) {
-            Log.v("Displaying alarm for instance: " + mInstance);
+        final long instanceId = AlarmInstance.getId(getIntent().getData());
+        mAlarmInstance = AlarmInstance.getInstance(getContentResolver(), instanceId);
+        if (mAlarmInstance != null) {
+            Log.v(LOGTAG + "Displaying alarm for instance: " + mAlarmInstance);
         } else {
             // The alarm got deleted before the activity got created, so just finish()
-            Log.v("Error displaying alarm for intent: " + getIntent());
+            Log.v(LOGTAG + "Error displaying alarm for intent: " + getIntent());
             finish();
             return;
         }
@@ -159,12 +166,11 @@ public class AlarmActivity extends Activity {
                         SettingsActivity.DEFAULT_VOLUME_BEHAVIOR);
         mVolumeBehavior = Integer.parseInt(vol);
 
-        final Window win = getWindow();
-        win.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
-                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
-                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
-                WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+                | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                | WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
 
         // In order to allow tablets to freely rotate and phones to stick
         // with "nosensor" (use default device orientation) we have to have
@@ -178,7 +184,7 @@ public class AlarmActivity extends Activity {
         updateLayout();
 
         // Register to get the alarm done/snooze/dismiss intent.
-        IntentFilter filter = new IntentFilter(AlarmService.ALARM_DONE_ACTION);
+        final IntentFilter filter = new IntentFilter(AlarmService.ALARM_DONE_ACTION);
         filter.addAction(ALARM_SNOOZE_ACTION);
         filter.addAction(ALARM_DISMISS_ACTION);
         registerReceiver(mReceiver, filter);
@@ -186,7 +192,7 @@ public class AlarmActivity extends Activity {
 
 
     private void updateTitle() {
-        final String titleText = mInstance.getLabelOrDefault(this);
+        final String titleText = mAlarmInstance.getLabelOrDefault(this);
         TextView tv = (TextView)findViewById(R.id.alertTitle);
         tv.setText(titleText);
         super.setTitle(titleText);
@@ -232,7 +238,12 @@ public class AlarmActivity extends Activity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(mReceiver);
+
+        // If the alarm instance is null the receiver was never registered and calling
+        // unregisterReceiver will throw an exception.
+        if (mAlarmInstance != null) {
+            unregisterReceiver(mReceiver);
+        }
     }
 
     @Override
@@ -241,10 +252,11 @@ public class AlarmActivity extends Activity {
     }
 
     @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
+    public boolean dispatchKeyEvent(KeyEvent keyEvent) {
         // Do this on key down to handle a few of the system keys.
-        Log.v("AlarmAlertFullScreen - dispatchKeyEvent " + event.getKeyCode());
-        switch (event.getKeyCode()) {
+        Log.v(LOGTAG + "AlarmAlertFullScreen - dispatchKeyEvent " + keyEvent);
+
+        switch (keyEvent.getKeyCode()) {
             // Volume keys and camera keys dismiss the alarm
             case KeyEvent.KEYCODE_POWER:
             case KeyEvent.KEYCODE_VOLUME_UP:
@@ -252,24 +264,21 @@ public class AlarmActivity extends Activity {
             case KeyEvent.KEYCODE_VOLUME_MUTE:
             case KeyEvent.KEYCODE_CAMERA:
             case KeyEvent.KEYCODE_FOCUS:
-                if (event.getAction() == KeyEvent.ACTION_UP) {
+                if (keyEvent.getAction() == KeyEvent.ACTION_UP) {
                     switch (mVolumeBehavior) {
-                        case 1:
+                        case SettingsActivity.VOLUME_BEHAVIOR_SNOOZE_INT:
                             snooze();
                             break;
-
-                        case 2:
+                        case SettingsActivity.VOLUME_BEHAVIOR_DISMISS_INT:
                             dismiss();
                             break;
-
                         default:
                             break;
                     }
                 }
                 return true;
             default:
-                break;
+                return super.dispatchKeyEvent(keyEvent);
         }
-        return super.dispatchKeyEvent(event);
     }
 }

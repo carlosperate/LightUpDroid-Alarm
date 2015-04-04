@@ -173,16 +173,18 @@ public class Utils {
         }
     }
 
-    /**  The pressed color used throughout the app. If this method is changed, it will not have
-     *   any effect on the button press states, and those must be changed separately.
-    **/
+    /**
+     * The pressed color used throughout the app. If this method is changed, it will not have
+     * any effect on the button press states, and those must be changed separately.
+     */
     public static int getPressedColorId() {
         return R.color.clock_red;
     }
 
-    /**  The un-pressed color used throughout the app. If this method is changed, it will not have
-     *   any effect on the button press states, and those must be changed separately.
-    **/
+    /**
+     * The un-pressed color used throughout the app. If this method is changed, it will not have
+     * any effect on the button press states, and those must be changed separately.
+     */
     public static int getGrayColorId() {
         return R.color.clock_gray;
     }
@@ -231,8 +233,9 @@ public class Utils {
         context.sendBroadcast(timerIntent);
     }
 
-    /** Runnable for use with screensaver and dream, to move the clock every minute.
-     *  registerViews() must be called prior to posting.
+    /**
+     * Runnable for use with screensaver and dream, to move the clock every minute.
+     * registerViews() must be called prior to posting.
      */
     public static class ScreensaverMoveSaverRunnable implements Runnable {
         static final long MOVE_DELAY = 60000; // DeskClock.SCREEN_SAVER_MOVE_DELAY;
@@ -477,7 +480,7 @@ public class Utils {
         }
     }
 
-    /***
+    /**
      * Formats the time in the TextClock according to the Locale with a special
      * formatting treatment for the am/pm label.
      * @param clock - TextClock to format
@@ -492,7 +495,8 @@ public class Utils {
             clock.setFormat24Hour(get24ModeFormat());
         }
     }
-    /***
+
+    /**
      * @param amPmFontSize - size of am/pm label (label removed is size is 0).
      * @return format string for 12 hours mode time
      */
@@ -537,7 +541,7 @@ public class Utils {
         int minLength = cities.length;
         if (cities.length != timezones.length || ids.length != cities.length) {
             minLength = Math.min(cities.length, Math.min(timezones.length, ids.length));
-            Log.e("City lists sizes are not the same, trancating");
+            Log.e("City lists sizes are not the same, truncating");
         }
         CityObj[] tempList = new CityObj[minLength];
         for (int i = 0; i < cities.length; i++) {

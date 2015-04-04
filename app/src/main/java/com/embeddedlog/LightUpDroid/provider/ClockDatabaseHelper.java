@@ -32,13 +32,8 @@ import com.embeddedlog.LightUpDroid.Log;
 public class ClockDatabaseHelper extends SQLiteOpenHelper {
     /**
      * Original Clock Database.
-     **/
-    private static final int VERSION_5 = 5;
-
-    /**
-     * CM 10.2 Clock database
      */
-    private static final int VERSION_CM102 = 7;
+    private static final int VERSION_5 = 5;
 
     /**
      * Introduce:
@@ -46,12 +41,12 @@ public class ClockDatabaseHelper extends SQLiteOpenHelper {
      * Added selected_cities table
      * Added DELETE_AFTER_USE column to alarms table
      */
-    private static final int VERSION_6 = 8;
+    private static final int VERSION_6 = 6;
 
     /**
      * Added alarm settings to instance table.
      */
-    private static final int VERSION_7 = 9;
+    private static final int VERSION_7 = 7;
 
     /**
      * 1: Added LightUpPi alarm ID to alarms table.

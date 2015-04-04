@@ -25,7 +25,6 @@ import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 
 import com.embeddedlog.LightUpDroid.alarms.AlarmStateManager;
-
 import com.embeddedlog.LightUpDroid.provider.AlarmInstance;
 import com.embeddedlog.LightUpDroid.timer.TimerObj;
 
@@ -46,6 +45,10 @@ public class AlarmInitReceiver extends BroadcastReceiver {
         final PendingResult result = goAsync();
         final WakeLock wl = AlarmAlertWakeLock.createPartialWakeLock(context);
         wl.acquire();
+
+        // We need to increment the global id out of the async task to prevent
+        // race conditions
+        AlarmStateManager.updateGloablIntentId(context);
         AsyncHandler.post(new Runnable() {
             @Override public void run() {
                 // Remove the snooze alarm after a boot.
@@ -64,12 +67,8 @@ public class AlarmInitReceiver extends BroadcastReceiver {
                     }
                 }
 
-                // Register all instances after major time changes or phone restarts
-                ContentResolver contentResolver = context.getContentResolver();
-                for (AlarmInstance instance : AlarmInstance.getInstances(contentResolver, null)) {
-                    AlarmStateManager.registerInstance(context, instance, false);
-                }
-                AlarmStateManager.updateNextAlarm(context);
+                // Update all the alarm instances on time change event
+                AlarmStateManager.fixAlarmInstances(context);
 
                 result.finish();
                 Log.v("AlarmInitReceiver finished");

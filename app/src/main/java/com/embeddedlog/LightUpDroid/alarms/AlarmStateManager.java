@@ -21,6 +21,7 @@ import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
@@ -101,14 +102,31 @@ public final class AlarmStateManager extends BroadcastReceiver {
     // Intent action to show the alarm and dismiss the instance
     public static final String SHOW_AND_DISMISS_ALARM_ACTION = "show_and_dismiss_alarm";
 
+    // Intent action for an AlarmManager alarm serving only to set the next alarm indicators
+    private static final String INDICATOR_ACTION = "indicator";
+
     // Extra key to set the desired state change.
     public static final String ALARM_STATE_EXTRA = "intent.extra.alarm.state";
+
+    // Extra key to set the global broadcast id.
+    private static final String ALARM_GLOBAL_ID_EXTRA = "intent.extra.alarm.global.id";
 
     // Intent category tag used when schedule state change intents in alarm manager.
     public static final String ALARM_MANAGER_TAG = "ALARM_MANAGER";
 
     // Buffer time in seconds to fire alarm instead of marking it missed.
     public static final int ALARM_FIRE_BUFFER = 15;
+
+    public static int getGlobalIntentId(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getInt(ALARM_GLOBAL_ID_EXTRA, -1);
+    }
+
+    public static void updateGloablIntentId(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        int globalId = prefs.getInt(ALARM_GLOBAL_ID_EXTRA, -1) + 1;
+        prefs.edit().putInt(ALARM_GLOBAL_ID_EXTRA, globalId).commit();
+    }
 
     /**
      * Find and notify system what the next alarm that will fire. This is used
@@ -183,6 +201,7 @@ public final class AlarmStateManager extends BroadcastReceiver {
         intent.setAction(CHANGE_STATE_ACTION);
         intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
         intent.addCategory(tag);
+        intent.putExtra(ALARM_GLOBAL_ID_EXTRA, getGlobalIntentId(context));
         if (state != null) {
             intent.putExtra(ALARM_STATE_EXTRA, state.intValue());
         }
@@ -590,6 +609,21 @@ public final class AlarmStateManager extends BroadcastReceiver {
     }
 
     /**
+     * Fix and update all alarm instance when a time change event occurs.
+     *
+     * @param context application context
+     */
+    public static void fixAlarmInstances(Context context) {
+        // Register all instances after major time changes or when phone restarts
+        // TODO: Refactor this code to not use the overloaded registerInstance method.
+        ContentResolver contentResolver = context.getContentResolver();
+        for (AlarmInstance instance : AlarmInstance.getInstances(contentResolver, null)) {
+           AlarmStateManager.registerInstance(context, instance, false);
+        }
+        AlarmStateManager.updateNextAlarm(context);
+    }
+
+    /**
      * Utility method to set alarm instance state via constants.
      *
      * @param context application context
@@ -629,6 +663,10 @@ public final class AlarmStateManager extends BroadcastReceiver {
 
     @Override
     public void onReceive(final Context context, final Intent intent) {
+        if (INDICATOR_ACTION.equals(intent.getAction())) {
+            return;
+        }
+
         final PendingResult result = goAsync();
         final PowerManager.WakeLock wl = AlarmAlertWakeLock.createPartialWakeLock(context);
         wl.acquire();
@@ -655,7 +693,15 @@ public final class AlarmStateManager extends BroadcastReceiver {
                 return;
             }
 
+            int globalId = getGlobalIntentId(context);
+            int intentId = intent.getIntExtra(ALARM_GLOBAL_ID_EXTRA, -1);
             int alarmState = intent.getIntExtra(ALARM_STATE_EXTRA, -1);
+            if (intentId != globalId) {
+                Log.i("Ignoring old Intent. IntentId: " + intentId + " GlobalId: " + globalId +
+                      " AlarmState: " + alarmState);
+                return;
+            }
+
             if (alarmState >= 0) {
                 setAlarmState(context, instance, alarmState);
             } else {
@@ -674,5 +720,13 @@ public final class AlarmStateManager extends BroadcastReceiver {
             context.startActivity(viewAlarmIntent);
             setDismissState(context, instance);
         }
+    }
+
+    /**
+     * Creates an intent that can be used to set an AlarmManager alarm to set the next alarm
+     * indicators.
+     */
+    public static Intent createIndicatorIntent(Context context) {
+        return new Intent(context, AlarmStateManager.class).setAction(INDICATOR_ACTION);
     }
 }

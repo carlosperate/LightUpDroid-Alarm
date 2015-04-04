@@ -230,7 +230,7 @@ public final class AlarmInstance implements ClockContract.InstancesColumns {
         // Make sure we are not adding a duplicate instances. This is not a
         // fix and should never happen. This is only a safe guard against bad code, and you
         // should fix the root issue if you see the error message.
-        String dupSelector = ALARM_ID + " = " + instance.mAlarmId;
+        String dupSelector = AlarmInstance.ALARM_ID + " = " + instance.mAlarmId;
         for (AlarmInstance otherInstances : getInstances(contentResolver, dupSelector)) {
             if (otherInstances.getAlarmTime().equals(instance.getAlarmTime())) {
                 Log.i("Detected duplicate instance in DB. Updating " + otherInstances + " to "

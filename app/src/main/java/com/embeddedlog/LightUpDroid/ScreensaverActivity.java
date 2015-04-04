@@ -59,6 +59,10 @@ public class ScreensaverActivity extends Activity {
     private final BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            if (DEBUG) {
+                Log.v(TAG, "ScreensaverActivity onReceive, action: " + intent.getAction());
+            }
+
             boolean changed = intent.getAction().equals(Intent.ACTION_TIME_CHANGED)
                     || intent.getAction().equals(Intent.ACTION_TIMEZONE_CHANGED);
             if (intent.getAction().equals(Intent.ACTION_POWER_CONNECTED)) {
@@ -76,7 +80,6 @@ public class ScreensaverActivity extends Activity {
                 Utils.refreshAlarm(ScreensaverActivity.this, mContentView);
                 Utils.setMidnightUpdater(mHandler, mMidnightUpdater);
             }
-
         }
     };
 

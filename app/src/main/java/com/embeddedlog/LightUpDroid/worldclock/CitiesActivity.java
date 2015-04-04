@@ -97,10 +97,10 @@ public class CitiesActivity extends Activity implements OnCheckedChangeListener,
 
     private String mSelectedCitiesHeaderString;
 
-    /***
+    /**
      * Adapter for a list of cities with the respected time zone. The Adapter
      * sorts the list alphabetically and create an indexer.
-     ***/
+     */
     private class CityAdapter extends BaseAdapter implements Filterable, SectionIndexer {
         private static final int VIEW_TYPE_CITY = 0;
         private static final int VIEW_TYPE_HEADER = 1;
@@ -153,6 +153,7 @@ public class CitiesActivity extends Activity implements OnCheckedChangeListener,
                                 null));
                     }
                     for (CityObj city : mSelectedCities) {
+                        city.isHeader = false;
                         filteredList.add(city);
                     }
                 }
@@ -176,11 +177,14 @@ public class CitiesActivity extends Activity implements OnCheckedChangeListener,
                         // If the list is sorted by name, and the city begins with a letter
                         // different than the previous city's letter, insert a section header.
                         if (mSortType == SORT_BY_NAME
-                                && !city.mCityName.substring(0, 1).equals(val)) {
+                                    && !city.mCityName.substring(0, 1).equals(val)) {
                                 val = city.mCityName.substring(0, 1).toUpperCase();
                                 sectionHeaders.add(val);
                                 sectionPositions.add(filteredList.size());
                                 filteredList.add(new CityObj(val, null, null));
+                                city.isHeader = true;
+                        } else {
+                                city.isHeader = false;
                         }
 
                         // If the list is sorted by time, and the gmt offset is different than
@@ -194,6 +198,9 @@ public class CitiesActivity extends Activity implements OnCheckedChangeListener,
                                 sectionHeaders.add(offsetString);
                                 sectionPositions.add(filteredList.size());
                                 filteredList.add(new CityObj(null, offsetString, null));
+                                city.isHeader = true;
+                            } else {
+                                city.isHeader = false;
                             }
                         }
                     }
@@ -202,6 +209,7 @@ public class CitiesActivity extends Activity implements OnCheckedChangeListener,
                     // If the query is empty, the city will automatically be added to the list.
                     String cityName = city.mCityName.trim().toUpperCase();
                     if (city.mCityId != null && cityName.startsWith(modifiedQuery)) {
+                        city.isHeader = false;
                         filteredList.add(city);
                     }
                 }
@@ -512,6 +520,11 @@ public class CitiesActivity extends Activity implements OnCheckedChangeListener,
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                Intent intent = new Intent(this, DeskClock.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                return true;
             case R.id.menu_item_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 return true;
@@ -530,11 +543,6 @@ public class CitiesActivity extends Activity implements OnCheckedChangeListener,
                     mAdapter.toggleSort();
                     setFastScroll(TextUtils.isEmpty(mQueryTextBuffer.toString().trim()));
                 }
-                return true;
-            case android.R.id.home:
-                Intent intent = new Intent(this, DeskClock.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
                 return true;
             default:
                 break;

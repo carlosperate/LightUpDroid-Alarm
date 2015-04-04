@@ -68,8 +68,14 @@ public class Screensaver extends DreamService {
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
-            if (action != null && (action.equals(Intent.ACTION_TIME_CHANGED)
-                    || action.equals(Intent.ACTION_TIMEZONE_CHANGED))) {
+            if (DEBUG) Log.v(TAG, "Screensaver onReceive, action: " + action);
+
+            if (action == null) {
+                return;
+            }
+
+            if (action.equals(Intent.ACTION_TIME_CHANGED)
+                    || action.equals(Intent.ACTION_TIMEZONE_CHANGED)) {
                 Utils.updateDate(mDateFormat, mDateFormatForAccessibility, mContentView);
                 Utils.refreshAlarm(Screensaver.this, mContentView);
                 Utils.setMidnightUpdater(mHandler, mMidnightUpdater);

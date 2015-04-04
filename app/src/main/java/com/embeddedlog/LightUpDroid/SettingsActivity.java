@@ -74,12 +74,18 @@ public class SettingsActivity extends PreferenceActivity
             "lightuppi_keep_new_alarms";
 
     public static final String DEFAULT_VOLUME_BEHAVIOR = "0";
+    public static final String VOLUME_BEHAVIOR_SNOOZE = "1";
+    public static final int VOLUME_BEHAVIOR_SNOOZE_INT = 1;
+    public static final String VOLUME_BEHAVIOR_DISMISS = "2";
+    public static final int VOLUME_BEHAVIOR_DISMISS_INT = 2;
 
     private static CharSequence[][] mTimezones;
     private long mTime;
 
     // Regular expresion used for IP input check
-    private static final Pattern ipRegEx = Pattern.compile("\\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b");
+    private static final Pattern ipRegEx = Pattern.compile(
+            "\\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)." +
+            "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b");
 
 
     @Override
@@ -191,7 +197,6 @@ public class SettingsActivity extends PreferenceActivity
             // Check if the new value is a valid IP
             if (ipRegEx.matcher((String) newValue).matches()) {
                 textPref.setSummary((String) newValue);
-                // TODO: Here trigger the pi IP change
             } else {
                 Toast.makeText(getApplicationContext(), R.string.lightuppi_invalid_ip,
                         Toast.LENGTH_LONG).show();

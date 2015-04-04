@@ -4,7 +4,12 @@ This is an Android companion app for the [LightUpPi Alarm](https://github.com/ca
 
 It is an Android alarm app that synchronizes to the alarms running in the `LightUpPi Alarm` Raspberry Pi system.
 
-It is based on the [Alarm Clock](https://github.com/klinker41/alarm-clock) app from Jacob Klinker, which in turn is a modification of the official Android Open Source Project [DeskClock](https://android.googlesource.com/platform/packages/apps/DeskClock/) application for Android 4.4 Kit Kat (updated for backwards compatibility with API 14).
+It is based on the [Alarm Clock](https://github.com/klinker41/alarm-clock) app by Jacob Klinker, which in turn is a modification of the official Android Open Source Project [DeskClock](https://android.googlesource.com/platform/packages/apps/DeskClock/) application for Android 4.4 Kit Kat (updated for backwards compatibility with API 14).
+
+<img src="https://raw.githubusercontent.com/carlosperate/LightUpDroid-Alarm/a4160d7de308eab2d5c30330e22df5620d50d889/screenshots/clock.png" alt="Clock Screen" width="24%"> 
+<img src="https://raw.githubusercontent.com/carlosperate/LightUpDroid-Alarm/master/screenshots/alarms.png" alt="Alarms Screen" width="24%"> 
+<img src="https://raw.githubusercontent.com/carlosperate/LightUpDroid-Alarm/master/screenshots/timepicker.png" alt="Timepicker Screen" width="24%"> 
+<img src="https://raw.githubusercontent.com/carlosperate/LightUpDroid-Alarm/master/screenshots/settings.png" alt="Settings Screen" width="24%"> 
 
 ## License
 This project is licensed under the Apache License, Version 2.0 (the "License").

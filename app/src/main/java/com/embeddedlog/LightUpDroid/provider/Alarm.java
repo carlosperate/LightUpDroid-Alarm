@@ -131,7 +131,7 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
      * @return cursor loader with all the alarms.
      */
     public static CursorLoader getAlarmsCursorLoader(Context context) {
-        return new CursorLoader(context, CONTENT_URI,
+        return new CursorLoader(context, ClockContract.AlarmsColumns.CONTENT_URI,
                 QUERY_COLUMNS, null, null, DEFAULT_SORT_ORDER);
     }
 
