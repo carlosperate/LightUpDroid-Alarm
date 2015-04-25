@@ -1,22 +1,26 @@
 # LightUpDroid Alarm
 
-This is an Android companion app for the [LightUpPi Alarm](https://github.com/carlosperate/LightUpPi-Alarm).
+This is an Android companion app for the [LightUpPi Alarm](http://github.com/carlosperate/LightUpPi-Alarm).
 
 It is an Android alarm app that synchronizes to the alarms running in the `LightUpPi Alarm` Raspberry Pi system.
 
-It is based on the [Alarm Clock](https://github.com/klinker41/alarm-clock) app by Jacob Klinker, which in turn is a modification of the official Android Open Source Project [DeskClock](https://android.googlesource.com/platform/packages/apps/DeskClock/) application for Android 4.4 Kit Kat (updated for backwards compatibility with API 14).
+It is based on the [Alarm Clock](http://github.com/klinker41/alarm-clock) app by Jacob Klinker, which in turn is a modification of the official Android Open Source Project [DeskClock](http://android.googlesource.com/platform/packages/apps/DeskClock/) (updated for backwards compatibility).
 
-<img src="https://raw.githubusercontent.com/carlosperate/LightUpDroid-Alarm/a4160d7de308eab2d5c30330e22df5620d50d889/screenshots/clock.png" alt="Clock Screen" width="24%"> 
-<img src="https://raw.githubusercontent.com/carlosperate/LightUpDroid-Alarm/master/screenshots/alarms.png" alt="Alarms Screen" width="24%"> 
-<img src="https://raw.githubusercontent.com/carlosperate/LightUpDroid-Alarm/master/screenshots/timepicker.png" alt="Timepicker Screen" width="24%"> 
-<img src="https://raw.githubusercontent.com/carlosperate/LightUpDroid-Alarm/master/screenshots/settings.png" alt="Settings Screen" width="24%"> 
+<img src="http://raw.githubusercontent.com/carlosperate/LightUpDroid-Alarm/master/screenshots/clock.png" alt="Clock Screen" width="24%"> 
+<img src="http://raw.githubusercontent.com/carlosperate/LightUpDroid-Alarm/master/screenshots/alarms.png" alt="Alarms Screen" width="24%"> 
+<img src="http://raw.githubusercontent.com/carlosperate/LightUpDroid-Alarm/master/screenshots/timepicker.png" alt="Timepicker Screen" width="24%"> 
+<img src="http://raw.githubusercontent.com/carlosperate/LightUpDroid-Alarm/master/screenshots/settings.png" alt="Settings Screen" width="24%"> 
+
 
 ## License
+
 This project is licensed under the Apache License, Version 2.0 (the "License").
 
-A copy of the License can be found in the `NOTICE` file.
+A copy of the License can be found in the [NOTICE](https://github.com/carlosperate/LightUpDroid-Alarm/blob/master/NOTICE) file.
+
 
 #### Original Authors 
+
 The original application has the following copyrights:
 
 Copyright (c) 2013 The Android Open Source Project
