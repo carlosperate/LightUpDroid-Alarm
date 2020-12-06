@@ -17,6 +17,7 @@
     <application android:label="@string/app_label"
                  android:icon="@mipmap/ic_launcher_alarmclock"
                  android:requiredForAllUsers="true"
+                 android:networkSecurityConfig="@xml/network_security_config"
                  android:supportsRtl="true">
 
         <provider android:name="com.embeddedlog.LightUpDroid.provider.ClockProvider"

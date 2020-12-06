@@ -15,6 +15,8 @@
  */
 package com.embeddedlog.LightUpDroid.alarms;
 
+import android.net.Uri;
+import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -45,9 +47,22 @@ public final class AlarmNotifications {
 
         // Set and notify next alarm text to system
         Log.i("Displaying next alarm time: \'" + timeString + '\'');
-        Settings.System.putString(context.getContentResolver(),
-                Settings.System.NEXT_ALARM_FORMATTED,
-                timeString);
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (Settings.System.canWrite(context)) {
+                Settings.System.putString(context.getContentResolver(),
+                        Settings.System.NEXT_ALARM_FORMATTED,
+                        timeString);
+            } else {
+                Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                intent.setData(Uri.parse("package:" + context.getPackageName()));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
+            }
+        }
+
+
         Intent alarmChanged = new Intent(SYSTEM_ALARM_CHANGE_ACTION);
         alarmChanged.putExtra("alarmSet", showStatusIcon);
         context.sendBroadcast(alarmChanged);

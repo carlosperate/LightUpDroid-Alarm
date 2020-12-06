@@ -577,27 +577,29 @@ public class LightUpPiSync {
                     try {
                         URL url = new URL(pingUri.build().toString());
                         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                        conn.setReadTimeout(3000);    /* milliseconds */
-                        conn.setConnectTimeout(5000); /* milliseconds */
+                        conn.setReadTimeout(10000);    /* milliseconds */
+                        conn.setConnectTimeout(10000); /* milliseconds */
                         conn.setRequestMethod("GET");
                         conn.setDoInput(true);
                         conn.connect();
                         response = conn.getResponseCode();
+
+                        if (response == 200) {
+                            if (Log.LOGV) Log.i(LOG_TAG + "Server response 200");
+                            guiHandler.post(online);
+                        } else {
+                            if (Log.LOGV) Log.i(LOG_TAG + "Server response NOT 200 but " + response);
+                            guiHandler.post(offline);
+                        }
                     } catch (Exception e) {
-                        // Safely ignored as a response!=200 will trigger the offline title
-                    }
-                    if (response == 200) {
-                        if (Log.LOGV) Log.i(LOG_TAG + "Server response 200");
-                        guiHandler.post(online);
-                    } else {
-                        if (Log.LOGV) Log.i(LOG_TAG + "Server response NOT 200");
+                        if (Log.LOGV) Log.i(LOG_TAG + "Server response NOT 200, exception caught:" + e.getMessage());
                         guiHandler.post(offline);
                     }
                 }
             }, 0, 30, TimeUnit.SECONDS);
             if (Log.LOGV) Log.v(LOG_TAG + "BackgroundServerCheck started");
         } else {
-            if (Log.LOGV) Log.d(LOG_TAG + "Server response NOT 200");
+            if (Log.LOGV) Log.d(LOG_TAG + "Server response NOT 200 could not connect to server");
             guiHandler.post(offline);
         }
     }
