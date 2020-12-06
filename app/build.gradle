@@ -1,12 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion '21.1.2'
+    compileSdkVersion 30
     defaultConfig {
         applicationId "com.embeddedlog.LightUpDroid"
-        minSdkVersion 17
-        targetSdkVersion 19
+        minSdkVersion 25
+        targetSdkVersion 30
     }
     buildTypes {
         release {
@@ -16,9 +15,12 @@ android {
     }
     productFlavors {
     }
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
-    compile project(':datetimepicker')
-    compile 'com.android.support:support-v13:21.0.3'
+    implementation project(':datetimepicker')
+    implementation 'com.android.support:support-v13:24.2.1'
 }
